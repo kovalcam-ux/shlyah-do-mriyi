@@ -7,10 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Шлях Героя">
+<meta name="apple-mobile-web-app-title" content="Шлях до мрії">
 <meta name="theme-color" content="#0b1322">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>">
-<title>Шлях Героя — трекер цілей</title>
+<title>Шлях до мрії — трекер цілей</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -240,7 +240,7 @@
         <div class="avatar">🦊</div>
         <div class="lvl-badge" id="lvlBadge">1</div>
       </div>
-      <h1>Шлях Героя
+      <h1>Шлях до мрії
         <span class="sub">Перетворюй цілі на пригоди</span>
       </h1>
     </div>
@@ -1286,7 +1286,7 @@ function exportBackup(){
   const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'shlyah-heroya-backup-'+todayStr()+'.json';
+  a.href = url; a.download = 'shlyah-do-mriyi-backup-'+todayStr()+'.json';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
   toast('💾 Резервну копію збережено!');
