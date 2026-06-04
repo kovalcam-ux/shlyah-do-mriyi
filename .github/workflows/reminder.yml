@@ -1,0 +1,22 @@
+name: daily-reminder
+
+# Щоденне нагадування в Telegram.
+# Потрібні два секрети в репозиторії (Settings -> Secrets and variables -> Actions):
+#   BOT_TOKEN — токен бота від BotFather
+#   CHAT_ID   — твій chat_id (число)
+
+on:
+  schedule:
+    # GitHub рахує час у UTC. 06:00 UTC ≈ 09:00 за Києвом (влітку UTC+3; узимку буде ~08:00).
+    - cron: '0 6 * * *'
+  workflow_dispatch:   # дозволяє запустити вручну — зручно для тесту
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram reminder
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.CHAT_ID }}" \
+            --data-urlencode text="🦊 Доброго ранку! Загляни у «Шлях до мрії»: познач щоденні справи 🔁 і зроби крок до цілі 🎯. Гарного дня! 💪"
