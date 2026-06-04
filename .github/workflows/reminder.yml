@@ -17,6 +17,14 @@ jobs:
     steps:
       - name: Send Telegram reminder
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendMessage" \
+          resp=$(curl -s -X POST "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendMessage" \
             -d chat_id="${{ secrets.CHAT_ID }}" \
-            --data-urlencode text="🦊 Доброго ранку! Загляни у «Шлях до мрії»: познач щоденні справи 🔁 і зроби крок до цілі 🎯. Гарного дня! 💪"
+            --data-urlencode text="🦊 Доброго ранку! Загляни у «Шлях до мрії»: познач щоденні справи 🔁 і зроби крок до цілі 🎯. Гарного дня! 💪")
+          if echo "$resp" | grep -q '"ok":true'; then
+            echo "✅ Повідомлення надіслано."
+          else
+            echo "❌ Помилка. Відповідь Telegram:"
+            echo "$resp"
+            echo "::error::Telegram не прийняв запит — перевір секрети BOT_TOKEN/CHAT_ID і що ти надіслав боту /start."
+            exit 1
+          fi
