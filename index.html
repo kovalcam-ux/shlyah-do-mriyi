@@ -634,10 +634,15 @@ function renderQuestNode(qid, node){
   else row += `<div class="node-box ${node.done?'done':''}" onclick="qToggleLeaf('${qid}','${node.id}')">${node.done?'✓':''}</div>`;
   row += `<div class="node-txt ${(!hasKids&&node.done)?'done':''}">${esc(node.text)}</div>`;
   if(hasKids) row += `<span class="node-prog">${s.done}/${s.leaves}</span>`;
+  const _qhow = questHow[node.id] || {};
+  row += `<button class="node-act" id="qNodeHow-${node.id}" onclick="qHowToNode('${qid}','${node.id}')" title="Як це зробити?">${_qhow.loading?'⏳':'💡'}</button>`;
   row += `<button class="node-act" id="qNodeGen-${node.id}" onclick="qDecompose('${qid}','${node.id}')" title="Розбити на підкроки">✨</button>`;
   row += `<button class="node-act" onclick="qAddChild('${qid}','${node.id}')" title="Додати підпункт">＋</button>`;
   row += `<button class="node-act" onclick="qDelNode('${qid}','${node.id}')" title="Видалити">✕</button>`;
   row += '</div>';
+  if(_qhow.open && _qhow.text){
+    row += `<div class="node-how"><button class="node-how-x" onclick="qHowToNode('${qid}','${node.id}')" title="Сховати">✕</button>${esc(_qhow.text)}</div>`;
+  }
   if(hasKids){
     row += `<div class="node-pbar"><div class="node-pfill" style="width:${prog}%"></div></div>`;
     if(open) row += `<div class="node-kids">${node.children.map(c=>renderQuestNode(qid,c)).join('')}</div>`;
@@ -654,7 +659,8 @@ async function genSteps(goal){
       model:"claude-haiku-4-5-20251001",
       max_tokens:1000,
       messages:[{role:"user",content:
-        `Розбий цю ціль на 4–6 конкретних, дієвих кроків українською мовою. Ціль: "${goal}". `+
+        `Розбий цю ціль на 4–6 конкретних, дієвих кроків українською мовою у реалістичному порядку. Ціль: "${goal}". `+
+        `Зважай: це для благодійної організації, що починає з нуля, без великого бюджету — кроки мають бути практичні й посильні малими силами. `+
         profileHint()+
         `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown. `+
         `Приклад формату: ["крок один","крок два"]`
@@ -763,6 +769,26 @@ function qToggleLeaf(qid,nid){
   save();
 }
 
+/* ===== «Як це зробити?» для кроків цілі ===== */
+let questHow = {}; // nodeId -> { text, open, loading }
+
+async function qHowToNode(qid, nid){
+  const cur = questHow[nid];
+  if(cur && cur.open){ cur.open=false; renderQuests(); return; }
+  if(cur && cur.text){ cur.open=true; renderQuests(); return; }
+  questHow[nid] = { loading:true, open:false };
+  renderQuests();
+  try{
+    const q=state.quests.find(x=>x.id===qid); const n=findNode(q.steps,nid);
+    const text = await genHowTo(n.text);
+    questHow[nid] = { text:text, open:true, loading:false };
+  }catch(e){
+    questHow[nid] = { loading:false, open:false };
+    toast('Не вдалося отримати поради. Спробуй ще раз.');
+  }
+  renderQuests();
+}
+
 async function qDecompose(qid,nid){
   const q=state.quests.find(x=>x.id===qid);
   const n=findNode(q.steps,nid);
@@ -784,7 +810,8 @@ async function genSubSteps(goalTitle, path, stepText){
     body:JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:1000,
       messages:[{role:"user",content:
         `У межах цілі "${goalTitle}" є крок (шлях: ${path}): "${stepText}". `+
-        `Розбий цей крок на 3–5 менших, конкретних, дієвих під-кроків українською. Якщо крок уже зовсім дрібний — зроби 2–4 зовсім прості дії. `+
+        `Розбий цей крок на 3–5 менших, конкретних, дієвих під-кроків українською у реалістичному порядку. Якщо крок уже зовсім дрібний — зроби 2–4 зовсім прості дії. `+
+        `Зважай: це для благодійної організації, що починає з нуля, без великого бюджету. `+
         profileHint()+
         `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown.` }]
     })
