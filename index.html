@@ -84,6 +84,9 @@
   .stat b{font-family:'Fraunces',serif;font-size:21px;display:block;font-weight:900}
   .stat span{font-size:11px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
   .stat.coins b{color:var(--gold)}
+  .lang-switch{position:absolute;top:14px;right:16px;display:flex;gap:4px;z-index:3}
+  .lang-btn{background:#0e1828;border:1px solid var(--line);color:var(--muted);font-family:inherit;font-weight:700;font-size:11px;letter-spacing:.5px;padding:4px 8px;border-radius:8px;cursor:pointer;transition:.15s}
+  .lang-btn.active{background:var(--gold);color:#14233f;border-color:var(--gold)}
 
   /* ===== Таби ===== */
   .tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin:22px 0 16px}
@@ -260,13 +263,17 @@
 
   <!-- ПРОФІЛЬ -->
   <div class="hero" id="hero">
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">UK</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
     <div class="hero-top">
       <div class="avatar-box">
-        <div class="avatar" id="avatar" onclick="openCharPicker()" title="Натисни, щоб обрати героя">🦊</div>
+        <div class="avatar" id="avatar" onclick="openCharPicker()" data-i18n-title="avatarTitle" title="Натисни, щоб обрати героя">🦊</div>
         <div class="lvl-badge" id="lvlBadge">1</div>
       </div>
-      <h1>Шлях до мрії
-        <span class="sub" id="charStage">Початківець · натисни героя зліва</span>
+      <h1><span data-i18n="appTitle">Шлях до мрії</span>
+        <span class="sub" id="charStage"></span>
       </h1>
     </div>
     <div class="xpbar-wrap">
@@ -277,57 +284,57 @@
       <div class="xpbar"><div class="xpbar-fill" id="xpFill"></div></div>
     </div>
     <div class="stats">
-      <div class="stat coins"><b id="coinStat">0</b><span>🪙 монет</span></div>
-      <div class="stat"><b id="doneStat">0</b><span>✅ цілей</span></div>
-      <div class="stat"><b id="stepStat">0</b><span>⚡ кроків</span></div>
+      <div class="stat coins"><b id="coinStat">0</b><span data-i18n="statCoins">🪙 монет</span></div>
+      <div class="stat"><b id="doneStat">0</b><span data-i18n="statGoals">✅ цілей</span></div>
+      <div class="stat"><b id="stepStat">0</b><span data-i18n="statSteps">⚡ кроків</span></div>
     </div>
   </div>
 
   <!-- ТАБИ -->
   <div class="tabs">
-    <button class="tab active" data-tab="quests" onclick="switchTab('quests')">🎯 Цілі</button>
-    <button class="tab" data-tab="daily" onclick="switchTab('daily')">🔁 Щодня</button>
-    <button class="tab" data-tab="dreams" onclick="switchTab('dreams')">🌟 Мрія</button>
-    <button class="tab" data-tab="rewards" onclick="switchTab('rewards')">🎁 Нагороди</button>
-    <button class="tab" data-tab="me" onclick="switchTab('me')">💪 Навички</button>
+    <button class="tab active" data-tab="quests" onclick="switchTab('quests')" data-i18n="tabQuests">🎯 Цілі</button>
+    <button class="tab" data-tab="daily" onclick="switchTab('daily')" data-i18n="tabDaily">🔁 Щодня</button>
+    <button class="tab" data-tab="dreams" onclick="switchTab('dreams')" data-i18n="tabDreams">🌟 Мрія</button>
+    <button class="tab" data-tab="rewards" onclick="switchTab('rewards')" data-i18n="tabRewards">🎁 Нагороди</button>
+    <button class="tab" data-tab="me" onclick="switchTab('me')" data-i18n="tabMe">💪 Навички</button>
   </div>
 
   <!-- ===== ТАБ: НАВИЧКИ ===== -->
   <div id="tab-me" class="hidden">
     <div class="new-zone">
-      <h3>Мої навички та сильні сторони</h3>
-      <p>Опиши, що в тебе добре виходить, чим захоплюєшся і що маєш у запасі. AI враховуватиме це, коли розбиватиме цілі на кроки — за принципом «підсилюй сильне».</p>
-      <label>Сильні навички та вміння</label>
-      <textarea id="meStrengths" rows="3" placeholder="Напр.: добре спілкуюся з людьми, вмію фотографувати, знаю основи бухгалтерії, маю права водія" oninput="onMeInput()"></textarea>
-      <label>Захоплення та інтереси</label>
-      <textarea id="meInterests" rows="2" placeholder="Напр.: відеомонтаж, рукоділля, рослини, ведення Instagram" oninput="onMeInput()"></textarea>
-      <label>Що маю в запасі (час, контакти, ресурси)</label>
-      <textarea id="meContext" rows="2" placeholder="Напр.: знайома ветеринарка, вільні вечори, аудиторія в TikTok" oninput="onMeInput()"></textarea>
+      <h3 data-i18n="meH">Мої навички та сильні сторони</h3>
+      <p data-i18n="meP">Опиши, що в тебе добре виходить, чим захоплюєшся і що маєш у запасі. AI враховуватиме це, коли розбиватиме цілі на кроки — за принципом «підсилюй сильне».</p>
+      <label data-i18n="meStrengthsLabel">Сильні навички та вміння</label>
+      <textarea id="meStrengths" rows="3" data-i18n-ph="meStrengthsPh" placeholder="Напр.: добре спілкуюся з людьми, вмію фотографувати, знаю основи бухгалтерії, маю права водія" oninput="onMeInput()"></textarea>
+      <label data-i18n="meInterestsLabel">Захоплення та інтереси</label>
+      <textarea id="meInterests" rows="2" data-i18n-ph="meInterestsPh" placeholder="Напр.: відеомонтаж, рукоділля, рослини, ведення Instagram" oninput="onMeInput()"></textarea>
+      <label data-i18n="meContextLabel">Що маю в запасі (час, контакти, ресурси)</label>
+      <textarea id="meContext" rows="2" data-i18n-ph="meContextPh" placeholder="Напр.: знайома ветеринарка, вільні вечори, аудиторія в TikTok" oninput="onMeInput()"></textarea>
     </div>
     <div class="new-zone" style="border-style:solid">
-      <h3>Не знаєш свої сильні сторони?</h3>
-      <p>Відповідай на кілька простих запитань — AI допоможе їх сформулювати.</p>
+      <h3 data-i18n="quizH">Не знаєш свої сильні сторони?</h3>
+      <p data-i18n="quizP">Відповідай на кілька простих запитань — AI допоможе їх сформулювати.</p>
       <button class="btn btn-ghost" id="quizToggle" onclick="toggleQuiz()">🧭 Пройти опитування</button>
       <div id="quizBox" class="hidden">
-        <label>Що тобі вдається легше, ніж іншим?</label>
+        <label data-i18n="q1">Що тобі вдається легше, ніж іншим?</label>
         <textarea id="q1" rows="2"></textarea>
-        <label>За що тебе зазвичай хвалять або дякують?</label>
+        <label data-i18n="q2">За що тебе зазвичай хвалять або дякують?</label>
         <textarea id="q2" rows="2"></textarea>
-        <label>Яка справа так захоплює, що забуваєш про час?</label>
+        <label data-i18n="q3">Яка справа так захоплює, що забуваєш про час?</label>
         <textarea id="q3" rows="2"></textarea>
-        <label>Чим зі зробленого останнім часом ти пишаєшся?</label>
+        <label data-i18n="q4">Чим зі зробленого останнім часом ти пишаєшся?</label>
         <textarea id="q4" rows="2"></textarea>
-        <label>У яких питаннях до тебе звертаються по допомогу?</label>
+        <label data-i18n="q5">У яких питаннях до тебе звертаються по допомогу?</label>
         <textarea id="q5" rows="2"></textarea>
-        <button class="btn btn-primary" id="quizBtn" onclick="analyzeStrengths()" style="margin-top:12px">✨ Визнач мої сильні сторони</button>
+        <button class="btn btn-primary" id="quizBtn" onclick="analyzeStrengths()" data-i18n="quizBtn" style="margin-top:12px">✨ Визнач мої сильні сторони</button>
       </div>
       <div id="quizResult"></div>
     </div>
 
     <div class="new-zone" style="border-style:solid">
-      <h3>Порада від AI</h3>
-      <p>AI подивиться на твої сильні сторони й активні цілі та підкаже, як спиратися на сильне.</p>
-      <button class="btn btn-primary" id="adviceBtn" onclick="getAdvice()">✨ Дай пораду</button>
+      <h3 data-i18n="adviceH">Порада від AI</h3>
+      <p data-i18n="adviceP">AI подивиться на твої сильні сторони й активні цілі та підкаже, як спиратися на сильне.</p>
+      <button class="btn btn-primary" id="adviceBtn" onclick="getAdvice()" data-i18n="adviceBtn">✨ Дай пораду</button>
       <div id="adviceBox"></div>
     </div>
   </div>
@@ -336,12 +343,12 @@
   <div id="tab-daily" class="hidden">
     <div class="streak-banner" id="dailyStreak"></div>
     <div class="new-zone">
-      <h3>Щоденна справа</h3>
-      <p>Рутина, що скидається щоранку: годування, прибирання, ліки. Можна позначити, хто відповідає.</p>
-      <input id="dlText" placeholder="Напр.: Погодувати собак (ранок)" style="margin-bottom:8px">
+      <h3 data-i18n="dailyH">Щоденна справа</h3>
+      <p data-i18n="dailyP">Рутина, що скидається щоранку: годування, прибирання, ліки. Можна позначити, хто відповідає.</p>
+      <input id="dlText" data-i18n-ph="dlTextPh" placeholder="Напр.: Погодувати собак (ранок)" style="margin-bottom:8px">
       <div class="row">
-        <input id="dlWho" placeholder="Хто? (Я / Дружина / Волонтер)" style="flex:1;min-width:150px">
-        <button class="btn btn-primary" onclick="addDaily()">＋ Додати</button>
+        <input id="dlWho" data-i18n-ph="dlWhoPh" placeholder="Хто? (Я / Дружина / Волонтер)" style="flex:1;min-width:150px">
+        <button class="btn btn-primary" onclick="addDaily()" data-i18n="addBtn">＋ Додати</button>
       </div>
     </div>
     <div id="dailyList"></div>
@@ -350,13 +357,13 @@
   <!-- ===== ТАБ: МРІЯ ===== -->
   <div id="tab-dreams" class="hidden">
     <div class="new-zone">
-      <h3>Велика мрія</h3>
-      <p>Признач масштабну мету — навіть без кроків. Відстежуй прогрес у сумі, а коли будеш готовий — розбий її на етапи.</p>
-      <input id="drTitle" placeholder="Напр.: Комплекс для порятунку тварин" style="margin-bottom:8px">
+      <h3 data-i18n="dreamH">Велика мрія</h3>
+      <p data-i18n="dreamP">Признач масштабну мету — навіть без кроків. Відстежуй прогрес у сумі, а коли будеш готовий — розбий її на етапи.</p>
+      <input id="drTitle" data-i18n-ph="drTitlePh" placeholder="Напр.: Комплекс для порятунку тварин" style="margin-bottom:8px">
       <div class="row">
-        <input id="drTarget" type="number" min="1" placeholder="Сума цілі (18000000)" style="flex:1;min-width:150px">
-        <input id="drUnit" placeholder="Валюта" value="$" style="flex:0 0 110px">
-        <button class="btn btn-primary" onclick="addDream()">＋ Додати мрію</button>
+        <input id="drTarget" type="number" min="1" data-i18n-ph="drTargetPh" placeholder="Сума цілі (18000000)" style="flex:1;min-width:150px">
+        <input id="drUnit" data-i18n-ph="drUnitPh" placeholder="Валюта" value="$" style="flex:0 0 110px">
+        <button class="btn btn-primary" onclick="addDream()" data-i18n="addDreamBtn">＋ Додати мрію</button>
       </div>
     </div>
     <div id="dreamList"></div>
@@ -365,12 +372,12 @@
   <!-- ===== ТАБ: ЦІЛІ ===== -->
   <div id="tab-quests">
     <div class="new-zone">
-      <h3>Нова ціль</h3>
-      <p>Опиши, чого хочеш досягти — Claude розіб'є це на чіткі кроки.</p>
-      <textarea id="goalInput" rows="2" placeholder="Напр.: Знайти 5 нових волонтерів для притулку"></textarea>
+      <h3 data-i18n="questH">Нова ціль</h3>
+      <p data-i18n="questP">Опиши, чого хочеш досягти — Claude розіб'є це на чіткі кроки.</p>
+      <textarea id="goalInput" rows="2" data-i18n-ph="goalInputPh" placeholder="Напр.: Знайти 5 нових волонтерів для притулку"></textarea>
       <div class="row" style="margin-top:10px">
-        <button class="btn btn-primary" id="genBtn" onclick="generateQuest()">✨ Створити кроки з AI</button>
-        <button class="btn btn-ghost" onclick="generateQuest(true)">✍️ Додати вручну</button>
+        <button class="btn btn-primary" id="genBtn" onclick="generateQuest()" data-i18n="genBtn">✨ Створити кроки з AI</button>
+        <button class="btn btn-ghost" onclick="generateQuest(true)" data-i18n="manualBtn">✍️ Додати вручну</button>
       </div>
       <div class="err hidden" id="genErr"></div>
     </div>
@@ -380,8 +387,8 @@
   <!-- ===== ТАБ: НАГОРОДИ ===== -->
   <div id="tab-rewards" class="hidden">
     <div class="new-zone" style="border-style:solid">
-      <h3 style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0" onclick="toggleCoinInfo()"><span>💡 Як працює курс монет?</span><span id="coinInfoArrow" style="color:var(--muted);font-size:14px">▸</span></h3>
-      <div id="coinInfoBody" class="hidden" style="margin-top:13px;font-size:13.5px;line-height:1.6;color:var(--cream)">
+      <h3 style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0" onclick="toggleCoinInfo()"><span data-i18n="coinInfoTitle">💡 Як працює курс монет?</span><span id="coinInfoArrow" style="color:var(--muted);font-size:14px">▸</span></h3>
+      <div id="coinInfoBody" class="hidden" data-i18n-html="coinInfoHtml" style="margin-top:13px;font-size:13.5px;line-height:1.6;color:var(--cream)">
         <p style="margin-bottom:8px">Монети — це твої зусилля у вигляді «валюти». Приблизно за дії:</p>
         <ul style="margin:0 0 11px 18px;padding:0">
           <li>⚡ крок цілі — <b>+20</b></li>
@@ -401,24 +408,24 @@
       </div>
     </div>
     <div class="new-zone">
-      <h3>Нова нагорода</h3>
-      <p>Признач собі винагороду за виконані цілі — заробляй монети й обмінюй їх.</p>
-      <input id="rwName" placeholder="Напр.: Замовити піцу 🍕" style="margin-bottom:8px">
+      <h3 data-i18n="rewardH">Нова нагорода</h3>
+      <p data-i18n="rewardP">Признач собі винагороду за виконані цілі — заробляй монети й обмінюй їх.</p>
+      <input id="rwName" data-i18n-ph="rwNamePh" placeholder="Напр.: Замовити піцу 🍕" style="margin-bottom:8px">
       <div class="row">
-        <input id="rwEmoji" placeholder="Емодзі (🍕)" style="flex:0 0 110px">
-        <input id="rwCost" type="number" min="1" placeholder="Ціна в 🪙" style="flex:1">
-        <button class="btn btn-primary" onclick="addReward()">＋ Додати</button>
+        <input id="rwEmoji" data-i18n-ph="rwEmojiPh" placeholder="Емодзі (🍕)" style="flex:0 0 110px">
+        <input id="rwCost" type="number" min="1" data-i18n-ph="rwCostPh" placeholder="Ціна в 🪙" style="flex:1">
+        <button class="btn btn-primary" onclick="addReward()" data-i18n="addBtn">＋ Додати</button>
       </div>
     </div>
     <div id="rewardList"></div>
   </div>
 
   <div class="footer-actions">
-    <button class="btn btn-ghost btn-sm" onclick="exportBackup()">💾 Зберегти копію</button>
-    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">↥ Відновити з копії</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportBackup()" data-i18n="backupBtn">💾 Зберегти копію</button>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()" data-i18n="restoreBtn">↥ Відновити з копії</button>
     <input type="file" id="importFile" accept="application/json,.json" class="hidden" onchange="importBackup(this)">
   </div>
-  <div class="footer-note">Прогрес зберігається автоматично (у Telegram — синхронізується між пристроями). Час від часу зберігайте копію — про всяк випадок.</div>
+  <div class="footer-note" data-i18n="footerNote">Прогрес зберігається автоматично (у Telegram — синхронізується між пристроями). Час від часу зберігайте копію — про всяк випадок.</div>
 
 </div>
 
@@ -426,37 +433,37 @@
 <div class="overlay" id="shareOverlay">
   <div class="modal">
     <button class="close-x" onclick="closeShare()">✕</button>
-    <h3>Поділитися прогресом</h3>
-    <p class="hint">Готова картинка для Instagram / Facebook. Обери формат, заповни підписи — і збережи або скопіюй текст.</p>
+    <h3 data-i18n="shareH">Поділитися прогресом</h3>
+    <p class="hint" data-i18n="shareHint">Готова картинка для Instagram / Facebook. Обери формат, заповни підписи — і збережи або скопіюй текст.</p>
 
     <div class="fmt-toggle">
-      <button class="fmt-btn active" data-fmt="square" onclick="setShareFormat('square')">⬛ Пост 1:1</button>
-      <button class="fmt-btn" data-fmt="story" onclick="setShareFormat('story')">📱 Сторіз 9:16</button>
+      <button class="fmt-btn active" data-fmt="square" onclick="setShareFormat('square')" data-i18n="fmtPost">⬛ Пост 1:1</button>
+      <button class="fmt-btn" data-fmt="story" onclick="setShareFormat('story')" data-i18n="fmtStory">📱 Сторіз 9:16</button>
     </div>
 
     <div class="canvas-wrap">
       <canvas id="shareCanvas" width="1080" height="1080"></canvas>
     </div>
 
-    <label>Назва фонду / підпис зверху</label>
-    <input class="full" id="shOrg" placeholder="Напр.: Прихисток для тварин «Лапа»" oninput="onShareInput()">
+    <label data-i18n="shOrgLabel">Назва фонду / підпис зверху</label>
+    <input class="full" id="shOrg" data-i18n-ph="shOrgPh" placeholder="Напр.: Прихисток для тварин «Лапа»" oninput="onShareInput()">
 
-    <label>Додатковий рядок (необов'язково)</label>
-    <input class="full" id="shSubtitle" placeholder="Напр.: 70 собак і 80 котів чекають на дім" oninput="onShareInput()">
+    <label data-i18n="shSubtitleLabel">Додатковий рядок (необов'язково)</label>
+    <input class="full" id="shSubtitle" data-i18n-ph="shSubtitlePh" placeholder="Напр.: 70 собак і 80 котів чекають на дім" oninput="onShareInput()">
 
-    <label>Контакт для допомоги</label>
-    <input class="full" id="shContact" placeholder="Напр.: @lapa_shelter або картка 0000 0000 0000 0000" oninput="onShareInput()">
+    <label data-i18n="shContactLabel">Контакт для допомоги</label>
+    <input class="full" id="shContact" data-i18n-ph="shContactPh" placeholder="Напр.: @lapa_shelter або картка 0000 0000 0000 0000" oninput="onShareInput()">
 
     <div class="row">
-      <button class="btn btn-primary full" onclick="downloadShare()">⬇️ Завантажити картинку</button>
+      <button class="btn btn-primary full" onclick="downloadShare()" data-i18n="downloadBtn">⬇️ Завантажити картинку</button>
     </div>
 
     <div class="cap-box">
-      <label>Текст допису</label>
-      <textarea class="full" id="shCaption" placeholder="Тут з'явиться готовий текст..."></textarea>
+      <label data-i18n="captionLabel">Текст допису</label>
+      <textarea class="full" id="shCaption" data-i18n-ph="captionPh" placeholder="Тут з'явиться готовий текст..."></textarea>
       <div class="row">
-        <button class="btn btn-ghost btn-sm" onclick="copyCaption()">📋 Скопіювати текст</button>
-        <button class="btn btn-gold btn-sm" id="aiCapBtn" onclick="aiCaption()">✨ AI-допис</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyCaption()" data-i18n="copyBtn">📋 Скопіювати текст</button>
+        <button class="btn btn-gold btn-sm" id="aiCapBtn" onclick="aiCaption()" data-i18n="aiCapBtn">✨ AI-допис</button>
       </div>
     </div>
   </div>
@@ -466,8 +473,8 @@
 <div class="overlay" id="charOverlay">
   <div class="modal">
     <button class="close-x" onclick="closeCharPicker()">✕</button>
-    <h3>Обери свого героя</h3>
-    <p class="hint">Кожен герой росте й змінює вигляд із твоїм рівнем. Змінити можна будь-коли.</p>
+    <h3 data-i18n="charPickH">Обери свого героя</h3>
+    <p class="hint" data-i18n="charPickHint">Кожен герой росте й змінює вигляд із твоїм рівнем. Змінити можна будь-коли.</p>
     <div id="charList"></div>
   </div>
 </div>
@@ -488,7 +495,8 @@ let state = {
   rewards:[],
   me:{ strengths:'', interests:'', context:'', advice:'' },
   share:{ org:'', contact:'', subtitle:'' },
-  character:'fox'
+  character:'fox',
+  lang:'uk'
 };
 /* ====== Універсальне сховище ======
    Працює в трьох середовищах:
@@ -553,6 +561,302 @@ async function load(){
   }catch(e){}
 }
 
+/* ================= ДВОМОВНІСТЬ (i18n) ================= */
+function langWord(){ return state.lang==='en' ? 'англійською' : 'українською'; } // цільова мова для AI-запитів
+const I18N = {
+  uk: {
+    docTitle:'Шлях до мрії — трекер цілей',
+    appTitle:'Шлях до мрії',
+    avatarTitle:'Натисни, щоб обрати героя',
+    lvl:(n)=>'Рівень '+n,
+    xp:(a,b)=>a+' / '+b+' XP',
+    statCoins:'🪙 монет', statGoals:'✅ цілей', statSteps:'⚡ кроків',
+    tabQuests:'🎯 Цілі', tabDaily:'🔁 Щодня', tabDreams:'🌟 Мрія', tabRewards:'🎁 Нагороди', tabMe:'💪 Навички',
+    ranks:['Початківець','Помічник','Опікун','Захисник','Хранитель','Легенда'],
+    charNames:{fox:'Лис-герой', beast:'Звір-захисник', bird:'Крилата вісниця', tree:'Деревце мрії', shelter:'Притулок', light:'Світло добра'},
+    // Навички
+    meH:'Мої навички та сильні сторони',
+    meP:'Опиши, що в тебе добре виходить, чим захоплюєшся і що маєш у запасі. AI враховуватиме це, коли розбиватиме цілі на кроки — за принципом «підсилюй сильне».',
+    meStrengthsLabel:'Сильні навички та вміння',
+    meStrengthsPh:'Напр.: добре спілкуюся з людьми, вмію фотографувати, знаю основи бухгалтерії, маю права водія',
+    meInterestsLabel:'Захоплення та інтереси',
+    meInterestsPh:'Напр.: відеомонтаж, рукоділля, рослини, ведення Instagram',
+    meContextLabel:'Що маю в запасі (час, контакти, ресурси)',
+    meContextPh:'Напр.: знайома ветеринарка, вільні вечори, аудиторія в TikTok',
+    quizH:'Не знаєш свої сильні сторони?',
+    quizP:'Відповідай на кілька простих запитань — AI допоможе їх сформулювати.',
+    quizOpen:'🧭 Пройти опитування', quizHide:'🙈 Сховати опитування',
+    q1:'Що тобі вдається легше, ніж іншим?',
+    q2:'За що тебе зазвичай хвалять або дякують?',
+    q3:'Яка справа так захоплює, що забуваєш про час?',
+    q4:'Чим зі зробленого останнім часом ти пишаєшся?',
+    q5:'У яких питаннях до тебе звертаються по допомогу?',
+    quizBtn:'✨ Визнач мої сильні сторони', quizBtnBusy:'<span class="spin">⏳</span> аналізую...',
+    adviceH:'Порада від AI',
+    adviceP:'AI подивиться на твої сильні сторони й активні цілі та підкаже, як спиратися на сильне.',
+    adviceBtn:'✨ Дай пораду', adviceBtnBusy:'<span class="spin">⏳</span> думаю...',
+    // Щодня
+    dailyH:'Щоденна справа',
+    dailyP:'Рутина, що скидається щоранку: годування, прибирання, ліки. Можна позначити, хто відповідає.',
+    dlTextPh:'Напр.: Погодувати собак (ранок)',
+    dlWhoPh:'Хто? (Я / Дружина / Волонтер)',
+    addBtn:'＋ Додати',
+    emptyDaily:'<span class="big">🔁</span>Ще немає щоденних справ.<br>Додай рутину — годування, прибирання, ліки.',
+    streakBanner:(streak,done,total)=>`🔥 Серія: <b>${streak}</b> ${plural(streak,'день','дні','днів')} поспіль · сьогодні ${done}/${total}`,
+    // Мрія
+    dreamH:'Велика мрія',
+    dreamP:'Признач масштабну мету — навіть без кроків. Відстежуй прогрес у сумі, а коли будеш готовий — розбий її на етапи.',
+    drTitlePh:'Напр.: Комплекс для порятунку тварин',
+    drTargetPh:'Сума цілі (18000000)', drUnitPh:'Валюта',
+    addDreamBtn:'＋ Додати мрію',
+    emptyDreams:'<span class="big">🌟</span>Ще немає великої мрії.<br>Признач масштабну мету, до якої прагнеш.',
+    treeEmptyDream:'Натисни «✨ Розбити», щоб AI поділив мрію на під-цілі — а кожну з них можна розбивати ще глибше, аж до маленьких кроків.',
+    contribBtn:'＋ Внесок', breakBtn:'✨ Розбити', subgoalBtn:'＋ Підціль',
+    dreamPct:(pctStr,leaves,doneN,taskPctStr)=>`💰 ${pctStr}% зібрано`+(leaves?` · 🎯 кроків ${doneN}/${leaves} (${taskPctStr}%)`:''),
+    // Цілі
+    questH:'Нова ціль',
+    questP:"Опиши, чого хочеш досягти — Claude розіб'є це на чіткі кроки.",
+    goalInputPh:'Напр.: Знайти 5 нових волонтерів для притулку',
+    genBtn:'✨ Створити кроки з AI', genBtnBusy:'<span class="spin">⏳</span> Claude думає...',
+    manualBtn:'✍️ Додати вручну',
+    emptyQuests:'<span class="big">🗺️</span>Поки що немає цілей.<br>Створи першу — і вирушай у пригоду!',
+    treeEmptyQuest:'Кроків ще немає. Додай кнопкою ＋ нижче.',
+    addStepRow:'додати крок',
+    questProgress:(done,total)=>`⚡ ${done} / ${total} кроків виконано`,
+    questDoneBanner:()=>`🏆 Ціль виконано! +${QUEST_BONUS} 🪙 бонус`,
+    firstStep:'Перший крок до цілі',
+    // підказки кнопок дерева
+    tHow:'Як це зробити?', tBreakSub:'Розбити на підкроки', tBreakDeep:'Розбити глибше',
+    tAddSub:'Додати підпункт', tDelete:'Видалити', tHide:'Сховати',
+    // Нагороди
+    coinInfoTitle:'💡 Як працює курс монет?',
+    coinInfoHtml:'<p style="margin-bottom:8px">Монети — це твої зусилля у вигляді «валюти». Приблизно за дії:</p><ul style="margin:0 0 11px 18px;padding:0"><li>⚡ крок цілі — <b>+20</b></li><li>🔁 щоденна справа — <b>+10</b> (і <b>+30</b> бонус, коли всі за день зроблено)</li><li>🏆 повністю виконана ціль — <b>+60</b> бонус</li><li>🌳 крок мрії — <b>+15</b></li></ul><p style="margin-bottom:11px">За активний день зазвичай виходить <b>≈ 100–200 монет</b>.</p><p style="margin-bottom:11px"><b>Головний принцип:</b> ціну нагороди міряй не в гривнях, а в <b>ДНЯХ зусиль</b> — тоді вона відчувається чесно заробленою.</p><p style="margin-bottom:6px"><b>Орієнтири:</b></p><ul style="margin:0 0 11px 18px;padding:0"><li>🍕 Піца / фастфуд — <b>~300–400</b> (≈ 3–4 дні)</li><li>🛍️ Щось купити собі, кіно — <b>~800–1200</b> (≈ тиждень-півтора)</li><li>🎉 Велика приємність — <b>~3000–5000</b> (≈ місяць)</li></ul><p style="margin:0"><b>Порада:</b> отримуєш нагороди надто легко — підвищ ціни; надто рідко — знизь.</p>',
+    rewardH:'Нова нагорода',
+    rewardP:'Признач собі винагороду за виконані цілі — заробляй монети й обмінюй їх.',
+    rwNamePh:'Напр.: Замовити піцу 🍕', rwEmojiPh:'Емодзі (🍕)', rwCostPh:'Ціна в 🪙',
+    emptyRewards:'<span class="big">🎁</span>Ще немає нагород.<br>Признач собі щось приємне за досягнення!',
+    claimBtn:'Забрати', rewardClaimed:'✅ Отримано',
+    // Футер
+    backupBtn:'💾 Зберегти копію', restoreBtn:'↥ Відновити з копії',
+    footerNote:'Прогрес зберігається автоматично (у Telegram — синхронізується між пристроями). Час від часу зберігайте копію — про всяк випадок.',
+    // Модалка шерингу
+    shareH:'Поділитися прогресом',
+    shareHint:'Готова картинка для Instagram / Facebook. Обери формат, заповни підписи — і збережи або скопіюй текст.',
+    fmtPost:'⬛ Пост 1:1', fmtStory:'📱 Сторіз 9:16',
+    shOrgLabel:'Назва фонду / підпис зверху', shOrgPh:'Напр.: Прихисток для тварин «Лапа»',
+    shSubtitleLabel:"Додатковий рядок (необов'язково)", shSubtitlePh:'Напр.: 70 собак і 80 котів чекають на дім',
+    shContactLabel:'Контакт для допомоги', shContactPh:'Напр.: @lapa_shelter або картка 0000 0000 0000 0000',
+    downloadBtn:'⬇️ Завантажити картинку',
+    captionLabel:'Текст допису', captionPh:"Тут з'явиться готовий текст...",
+    copyBtn:'📋 Скопіювати текст', aiCapBtn:'✨ AI-допис',
+    // Модалка персонажа
+    charPickH:'Обери свого героя',
+    charPickHint:'Кожен герой росте й змінює вигляд із твоїм рівнем. Змінити можна будь-коли.',
+    // Тости / діалоги
+    heroChosen:'🎭 Героя обрано!',
+    levelUp:(level,grew,rank)=>`🎉 Рівень ${level}! `+(grew?('Герой росте — тепер ти '+rank+'!'):'Так тримати!'),
+    questAdded:'🎯 Нова ціль додана!',
+    genErr:'Не вдалося згенерувати кроки автоматично. Створив ціль — додай кроки вручну кнопкою «+ додати крок».',
+    promptStep:'Текст кроку:', promptSubstep:'Текст підкроку:',
+    confirmDelStep:'Видалити цей крок і все під ним?',
+    coinStep:()=>`+${COIN_PER_STEP} 🪙  ⚡`,
+    questDoneToast:(amt)=>`🏆 Ціль виконано! +${amt} 🪙`,
+    confirmRegenSub:'Підкроки вже є. Згенерувати наново?',
+    decomposed:'✨ Розбито на підкроки!',
+    genericFail:'Не вдалося. Спробуй ще раз.',
+    howFail:'Не вдалося отримати поради. Спробуй ще раз.',
+    confirmDelQuest:'Видалити цю ціль?',
+    adviceFirst:'Спершу опиши свої навички вище 🙂',
+    adviceReady:'✨ Порада готова!',
+    adviceFail:'Не вдалося отримати пораду. Спробуй ще раз.',
+    quizMin2:'Дай відповідь хоча б на 2 запитання 🙂',
+    quizResultLabel:'Ось що вдалося розгледіти:',
+    addToSkills:'➕ Додати до моїх навичок',
+    doneShort:'✨ Готово!', addedToSkills:'✅ Додано в навички!',
+    coinPlus:(n)=>`+${n} 🪙`,
+    dailyAllDone:(streak)=>`🔥 Усі справи на сьогодні! Серія: ${streak} ${plural(streak,'день','дні','днів')} · +${DAILY_BONUS} 🪙`,
+    dreamSaved:'🌟 Мрію збережено!',
+    contribPrompt:(unit)=>`Скільки додати до прогресу? (${unit})`,
+    contribToast:(amtStr,unit)=>`💪 +${amtStr} ${unit} до мрії!`,
+    promptSubgoal:'Текст під-цілі:', promptSubitem:'Текст підпункту:',
+    allDreamDone:'🏆 Усі кроки мрії пройдено!',
+    confirmDelNode:'Видалити цей пункт і все під ним?',
+    confirmRegenDream:'Під-цілі вже є. Згенерувати наново (замінить верхній рівень)?',
+    dreamBroken:'🗺️ Мрію розбито на під-цілі!',
+    confirmRegenSub2:'Підпункти вже є. Згенерувати наново?',
+    decomposedDeep:'✨ Розбито глибше!',
+    confirmDelDream:'Видалити цю мрію?',
+    imgSaved:'⬇️ Картинку збережено!',
+    copied:'📋 Текст скопійовано!', selectCtrlC:'Виділив текст — натисни Ctrl+C',
+    aiCaptionDone:'✨ AI написав допис!',
+    confirmClaim:(cost,name)=>`Обміняти ${cost} 🪙 на «${name}»?`,
+    rewardUnlocked:(name)=>'🎉 Нагороду розблоковано: '+name,
+    confirmRestore:'Відновити дані з копії? Поточний прогрес буде замінено.',
+    dataRestored:'✅ Дані відновлено!', backupReadFail:'Не вдалося прочитати файл копії.',
+    backupSaved:'💾 Резервну копію збережено!',
+    sampleRewards:[{name:'Замовити піцу 🍕',emoji:'🍕',cost:120},{name:'Макдональдс',emoji:'🍔',cost:80},{name:'Купити щось собі',emoji:'🛍️',cost:200},{name:'Вечір серіалів без докорів сумління',emoji:'📺',cost:60}],
+    // Канвас банера / допис
+    capDream:(title)=>`🐾 Наша мрія: ${title}`,
+    capRaised:(cur,unit,target,pct)=>`Уже зібрано ${cur} ${unit} з ${target} ${unit} — це ${pct}% шляху!`,
+    capJoin:'Кожен внесок наближає дім для тварин. Долучайся 💛',
+    cardOrgDefault:'Збір на велику мрію',
+    cardRaised:(cur,target,unit)=>`Зібрано ${cur} з ${target} ${unit}`,
+    cardJoin:'Долучайся до мрії 🐾'
+  },
+  en: {
+    docTitle:'Path to the Dream — goal tracker',
+    appTitle:'Path to the Dream',
+    avatarTitle:'Tap to choose your hero',
+    lvl:(n)=>'Level '+n,
+    xp:(a,b)=>a+' / '+b+' XP',
+    statCoins:'🪙 coins', statGoals:'✅ goals', statSteps:'⚡ steps',
+    tabQuests:'🎯 Goals', tabDaily:'🔁 Daily', tabDreams:'🌟 Dream', tabRewards:'🎁 Rewards', tabMe:'💪 Skills',
+    ranks:['Beginner','Helper','Caretaker','Defender','Guardian','Legend'],
+    charNames:{fox:'Hero Fox', beast:'Guardian Beast', bird:'Winged Messenger', tree:'Dream Sapling', shelter:'The Shelter', light:'Light of Kindness'},
+    meH:'My skills and strengths',
+    meP:"Describe what you're good at, what you enjoy, and what you have on hand. The AI uses this when breaking goals into steps — the «build on your strengths» principle.",
+    meStrengthsLabel:'Strong skills & abilities',
+    meStrengthsPh:'e.g., great with people, can take photos, know basic bookkeeping, have a driving licence',
+    meInterestsLabel:'Hobbies & interests',
+    meInterestsPh:'e.g., video editing, crafts, plants, running Instagram',
+    meContextLabel:'What I have (time, contacts, resources)',
+    meContextPh:'e.g., a vet friend, free evenings, a TikTok audience',
+    quizH:'Not sure what your strengths are?',
+    quizP:'Answer a few simple questions — the AI will help put them into words.',
+    quizOpen:'🧭 Take the quiz', quizHide:'🙈 Hide the quiz',
+    q1:'What comes easier to you than to others?',
+    q2:'What do people usually praise or thank you for?',
+    q3:'What activity absorbs you so much you lose track of time?',
+    q4:"What have you done recently that you're proud of?",
+    q5:'What do people come to you for help with?',
+    quizBtn:'✨ Find my strengths', quizBtnBusy:'<span class="spin">⏳</span> analysing...',
+    adviceH:'AI advice',
+    adviceP:'The AI looks at your strengths and active goals and suggests how to lean on them.',
+    adviceBtn:'✨ Get advice', adviceBtnBusy:'<span class="spin">⏳</span> thinking...',
+    dailyH:'Daily task',
+    dailyP:"A routine that resets every morning: feeding, cleaning, meds. You can mark who's responsible.",
+    dlTextPh:'e.g., Feed the dogs (morning)',
+    dlWhoPh:'Who? (Me / Spouse / Volunteer)',
+    addBtn:'＋ Add',
+    emptyDaily:'<span class="big">🔁</span>No daily tasks yet.<br>Add a routine — feeding, cleaning, meds.',
+    streakBanner:(streak,done,total)=>`🔥 Streak: <b>${streak}</b> ${streak===1?'day':'days'} in a row · today ${done}/${total}`,
+    dreamH:'Big dream',
+    dreamP:"Set an ambitious goal — even without steps. Track progress by amount, and when you're ready, break it into stages.",
+    drTitlePh:'e.g., An animal rescue centre',
+    drTargetPh:'Target amount (18000000)', drUnitPh:'Currency',
+    addDreamBtn:'＋ Add dream',
+    emptyDreams:'<span class="big">🌟</span>No big dream yet.<br>Set an ambitious goal to strive for.',
+    treeEmptyDream:"Tap «✨ Break down» so the AI splits the dream into sub-goals — and each one can be broken down further, all the way to tiny steps.",
+    contribBtn:'＋ Contribution', breakBtn:'✨ Break down', subgoalBtn:'＋ Sub-goal',
+    dreamPct:(pctStr,leaves,doneN,taskPctStr)=>`💰 ${pctStr}% raised`+(leaves?` · 🎯 steps ${doneN}/${leaves} (${taskPctStr}%)`:''),
+    questH:'New goal',
+    questP:'Describe what you want to achieve — Claude will break it into clear steps.',
+    goalInputPh:'e.g., Find 5 new volunteers for the shelter',
+    genBtn:'✨ Generate steps with AI', genBtnBusy:'<span class="spin">⏳</span> Claude is thinking...',
+    manualBtn:'✍️ Add manually',
+    emptyQuests:'<span class="big">🗺️</span>No goals yet.<br>Create your first one and set off on an adventure!',
+    treeEmptyQuest:'No steps yet. Add one with the ＋ button below.',
+    addStepRow:'add a step',
+    questProgress:(done,total)=>`⚡ ${done} / ${total} steps done`,
+    questDoneBanner:()=>`🏆 Goal complete! +${QUEST_BONUS} 🪙 bonus`,
+    firstStep:'First step toward the goal',
+    tHow:'How to do it?', tBreakSub:'Break into sub-steps', tBreakDeep:'Break down further',
+    tAddSub:'Add a sub-item', tDelete:'Delete', tHide:'Hide',
+    coinInfoTitle:'💡 How does the coin rate work?',
+    coinInfoHtml:'<p style="margin-bottom:8px">Coins are your effort turned into a «currency». Roughly per action:</p><ul style="margin:0 0 11px 18px;padding:0"><li>⚡ goal step — <b>+20</b></li><li>🔁 daily task — <b>+10</b> (and a <b>+30</b> bonus when all are done for the day)</li><li>🏆 fully completed goal — <b>+60</b> bonus</li><li>🌳 dream step — <b>+15</b></li></ul><p style="margin-bottom:11px">An active day usually brings <b>≈ 100–200 coins</b>.</p><p style="margin-bottom:11px"><b>The main idea:</b> price a reward not in money, but in <b>DAYS of effort</b> — so it feels honestly earned.</p><p style="margin-bottom:6px"><b>Rough guide:</b></p><ul style="margin:0 0 11px 18px;padding:0"><li>🍕 Pizza / fast food — <b>~300–400</b> (≈ 3–4 days)</li><li>🛍️ Buy yourself something, cinema — <b>~800–1200</b> (≈ a week and a half)</li><li>🎉 A big treat — <b>~3000–5000</b> (≈ a month)</li></ul><p style="margin:0"><b>Tip:</b> getting rewards too easily — raise the prices; too rarely — lower them.</p>',
+    rewardH:'New reward',
+    rewardP:'Set yourself a reward for completed goals — earn coins and spend them.',
+    rwNamePh:'e.g., Order pizza 🍕', rwEmojiPh:'Emoji (🍕)', rwCostPh:'Price in 🪙',
+    emptyRewards:'<span class="big">🎁</span>No rewards yet.<br>Set yourself a treat for your achievements!',
+    claimBtn:'Claim', rewardClaimed:'✅ Claimed',
+    backupBtn:'💾 Save backup', restoreBtn:'↥ Restore backup',
+    footerNote:'Progress is saved automatically (in Telegram it syncs across your devices). Save a backup now and then, just in case.',
+    shareH:'Share your progress',
+    shareHint:'A ready image for Instagram / Facebook. Pick a format, fill in the captions — then save it or copy the text.',
+    fmtPost:'⬛ Post 1:1', fmtStory:'📱 Story 9:16',
+    shOrgLabel:'Fund name / top caption', shOrgPh:"e.g., «Lapa» Animal Shelter",
+    shSubtitleLabel:'Extra line (optional)', shSubtitlePh:'e.g., 70 dogs and 80 cats are waiting for a home',
+    shContactLabel:'Contact for help', shContactPh:'e.g., @lapa_shelter or card 0000 0000 0000 0000',
+    downloadBtn:'⬇️ Download image',
+    captionLabel:'Caption text', captionPh:'The ready text will appear here...',
+    copyBtn:'📋 Copy text', aiCapBtn:'✨ AI caption',
+    charPickH:'Choose your hero',
+    charPickHint:'Each hero grows and changes look as you level up. You can switch anytime.',
+    heroChosen:'🎭 Hero chosen!',
+    levelUp:(level,grew,rank)=>`🎉 Level ${level}! `+(grew?("Your hero is growing — you're now a "+rank+'!'):'Keep it up!'),
+    questAdded:'🎯 New goal added!',
+    genErr:"Couldn't generate steps automatically. I created the goal — add steps manually with the «+ add a step» button.",
+    promptStep:'Step text:', promptSubstep:'Sub-step text:',
+    confirmDelStep:'Delete this step and everything under it?',
+    coinStep:()=>`+${COIN_PER_STEP} 🪙  ⚡`,
+    questDoneToast:(amt)=>`🏆 Goal complete! +${amt} 🪙`,
+    confirmRegenSub:'Sub-steps already exist. Regenerate?',
+    decomposed:'✨ Broken into sub-steps!',
+    genericFail:'Something went wrong. Try again.',
+    howFail:"Couldn't get advice. Try again.",
+    confirmDelQuest:'Delete this goal?',
+    adviceFirst:'Describe your skills above first 🙂',
+    adviceReady:'✨ Advice is ready!',
+    adviceFail:"Couldn't get advice. Try again.",
+    quizMin2:'Answer at least 2 questions 🙂',
+    quizResultLabel:"Here's what I could spot:",
+    addToSkills:'➕ Add to my skills',
+    doneShort:'✨ Done!', addedToSkills:'✅ Added to skills!',
+    coinPlus:(n)=>`+${n} 🪙`,
+    dailyAllDone:(streak)=>`🔥 All done for today! Streak: ${streak} ${streak===1?'day':'days'} · +${DAILY_BONUS} 🪙`,
+    dreamSaved:'🌟 Dream saved!',
+    contribPrompt:(unit)=>`How much to add to progress? (${unit})`,
+    contribToast:(amtStr,unit)=>`💪 +${amtStr} ${unit} toward the dream!`,
+    promptSubgoal:'Sub-goal text:', promptSubitem:'Sub-item text:',
+    allDreamDone:'🏆 All dream steps completed!',
+    confirmDelNode:'Delete this item and everything under it?',
+    confirmRegenDream:'Sub-goals already exist. Regenerate (replaces the top level)?',
+    dreamBroken:'🗺️ Dream broken into sub-goals!',
+    confirmRegenSub2:'Sub-items already exist. Regenerate?',
+    decomposedDeep:'✨ Broken down further!',
+    confirmDelDream:'Delete this dream?',
+    imgSaved:'⬇️ Image saved!',
+    copied:'📋 Text copied!', selectCtrlC:'Text selected — press Ctrl+C',
+    aiCaptionDone:'✨ The AI wrote the caption!',
+    confirmClaim:(cost,name)=>`Spend ${cost} 🪙 on "${name}"?`,
+    rewardUnlocked:(name)=>'🎉 Reward unlocked: '+name,
+    confirmRestore:'Restore data from the backup? Current progress will be replaced.',
+    dataRestored:'✅ Data restored!', backupReadFail:"Couldn't read the backup file.",
+    backupSaved:'💾 Backup saved!',
+    sampleRewards:[{name:'Order pizza 🍕',emoji:'🍕',cost:120},{name:"McDonald's",emoji:'🍔',cost:80},{name:'Buy yourself something',emoji:'🛍️',cost:200},{name:'A guilt-free evening of series',emoji:'📺',cost:60}],
+    capDream:(title)=>`🐾 Our dream: ${title}`,
+    capRaised:(cur,unit,target,pct)=>`We've raised ${cur} ${unit} of ${target} ${unit} — that's ${pct}% of the way!`,
+    capJoin:'Every contribution brings animals closer to a home. Join in 💛',
+    cardOrgDefault:'Raising funds for a big dream',
+    cardRaised:(cur,target,unit)=>`Raised ${cur} of ${target} ${unit}`,
+    cardJoin:'Join the dream 🐾'
+  }
+};
+function t(key, ...args){
+  const d = I18N[state.lang] || I18N.uk;
+  let v = (key in d) ? d[key] : (I18N.uk[key]!==undefined ? I18N.uk[key] : key);
+  return (typeof v==='function') ? v(...args) : v;
+}
+function applyI18n(){
+  document.documentElement.lang = state.lang;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.getAttribute('data-i18n-html')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.setAttribute('title', t(el.getAttribute('data-i18n-title'))); });
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===state.lang));
+  const qb=document.getElementById('quizBox'), qt=document.getElementById('quizToggle');
+  if(qb && qt) qt.textContent = qb.classList.contains('hidden') ? t('quizOpen') : t('quizHide');
+}
+function setLang(lang){
+  if(lang!==state.lang){ state.lang=lang; save(); }
+  applyI18n();
+  renderProfile(); renderQuests(); renderDaily(); renderDreams(); renderRewards();
+  if(shareDreamId && document.getElementById('shareOverlay').classList.contains('show')){
+    document.getElementById('shCaption').value = buildCaption(); drawShareCard();
+  }
+}
+
 /* ================= РІВНІ ================= */
 function levelInfo(xp){
   let level=1, need=100, acc=0;
@@ -580,7 +884,7 @@ function openCharPicker(){
     <div class="char-card ${c.id===state.character?'sel':''}" onclick="chooseChar('${c.id}')">
       <div class="char-now">${c.e[si]}</div>
       <div class="char-info">
-        <b>${c.name}</b>
+        <b>${t('charNames')[c.id]}</b>
         <div class="char-line">${c.e.map((em,i)=>`<span class="${i<=si?'':'lock'}">${em}</span>`).join('<span class="arr">›</span>')}</div>
       </div>
       ${c.id===state.character?'<div class="char-badge">✓</div>':''}
@@ -590,7 +894,7 @@ function openCharPicker(){
 function chooseChar(id){
   state.character=id; save(); renderProfile();
   document.getElementById('charOverlay').classList.remove('show');
-  toast('🎭 Героя обрано!');
+  toast(t('heroChosen'));
 }
 function closeCharPicker(){ document.getElementById('charOverlay').classList.remove('show'); }
 
@@ -600,17 +904,17 @@ function renderProfile(prevLevel){
   const li = levelInfo(p.totalXp);
   const ch = currentChar(); const si = stageIndex(li.level);
   document.getElementById('avatar').textContent = ch.e[si];
-  document.getElementById('charStage').textContent = RANKS[si] + ' · ' + ch.name;
+  document.getElementById('charStage').textContent = t('ranks')[si] + ' · ' + t('charNames')[ch.id];
   document.getElementById('lvlBadge').textContent = li.level;
-  document.getElementById('lvlText').textContent = 'Рівень ' + li.level;
-  document.getElementById('xpText').textContent = li.into + ' / ' + li.need + ' XP';
+  document.getElementById('lvlText').textContent = t('lvl', li.level);
+  document.getElementById('xpText').textContent = t('xp', li.into, li.need);
   document.getElementById('xpFill').style.width = Math.min(100,(li.into/li.need)*100) + '%';
   document.getElementById('coinStat').textContent = p.coins;
   document.getElementById('doneStat').textContent = p.questsDone;
   document.getElementById('stepStat').textContent = p.stepsDone;
   if(prevLevel!==undefined && li.level>prevLevel){
     const ns = stageIndex(li.level);
-    toast('🎉 Рівень ' + li.level + '! ' + (ns>stageIndex(prevLevel)?('Герой росте — тепер ти '+RANKS[ns]+'!'):'Так тримати!'), true);
+    toast(t('levelUp', li.level, ns>stageIndex(prevLevel), t('ranks')[ns]), true);
     document.getElementById('hero').classList.add('pop');
     setTimeout(()=>document.getElementById('hero').classList.remove('pop'),400);
   }
@@ -620,7 +924,7 @@ function renderProfile(prevLevel){
 function renderQuests(){
   const el = document.getElementById('questList');
   if(state.quests.length===0){
-    el.innerHTML = '<div class="empty"><span class="big">🗺️</span>Поки що немає цілей.<br>Створи першу — і вирушай у пригоду!</div>';
+    el.innerHTML = '<div class="empty">'+t('emptyQuests')+'</div>';
     return;
   }
   el.innerHTML = state.quests.map(q=>{
@@ -628,19 +932,19 @@ function renderQuests(){
     const complete = st.leaves>0 && st.done===st.leaves;
     const treeHtml = (q.steps && q.steps.length)
       ? q.steps.map(n=>renderQuestNode(q.id,n)).join('')
-      : '<div class="tree-empty">Кроків ще немає. Додай кнопкою ＋ нижче.</div>';
+      : '<div class="tree-empty">'+t('treeEmptyQuest')+'</div>';
     return `<div class="card">
       <div class="card-head">
         <div>
           <div class="card-title">${esc(q.title)}</div>
-          <div class="q-progress">⚡ ${st.done} / ${st.leaves} кроків виконано</div>
+          <div class="q-progress">${t('questProgress', st.done, st.leaves)}</div>
         </div>
-        <button class="mini" title="Видалити" onclick="delQuest('${q.id}')">✕</button>
+        <button class="mini" title="${t('tDelete')}" onclick="delQuest('${q.id}')">✕</button>
       </div>
       <div class="tree">${treeHtml}
-        <div class="node-row" style="cursor:pointer;color:var(--muted)" onclick="qAddChild('${q.id}',null)"><span style="width:18px;flex:none;text-align:center">＋</span><div class="node-txt">додати крок</div></div>
+        <div class="node-row" style="cursor:pointer;color:var(--muted)" onclick="qAddChild('${q.id}',null)"><span style="width:18px;flex:none;text-align:center">＋</span><div class="node-txt">${t('addStepRow')}</div></div>
       </div>
-      ${complete?`<div class="quest-done-banner">🏆 Ціль виконано! +${QUEST_BONUS} 🪙 бонус</div>`:''}
+      ${complete?`<div class="quest-done-banner">${t('questDoneBanner')}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -656,13 +960,13 @@ function renderQuestNode(qid, node){
   row += `<div class="node-txt ${(!hasKids&&node.done)?'done':''}">${esc(node.text)}</div>`;
   if(hasKids) row += `<span class="node-prog">${s.done}/${s.leaves}</span>`;
   const _qhow = questHow[node.id] || {};
-  row += `<button class="node-act" id="qNodeHow-${node.id}" onclick="qHowToNode('${qid}','${node.id}')" title="Як це зробити?">${_qhow.loading?'⏳':'💡'}</button>`;
-  row += `<button class="node-act" id="qNodeGen-${node.id}" onclick="qDecompose('${qid}','${node.id}')" title="Розбити на підкроки">✨</button>`;
-  row += `<button class="node-act" onclick="qAddChild('${qid}','${node.id}')" title="Додати підпункт">＋</button>`;
-  row += `<button class="node-act" onclick="qDelNode('${qid}','${node.id}')" title="Видалити">✕</button>`;
+  row += `<button class="node-act" id="qNodeHow-${node.id}" onclick="qHowToNode('${qid}','${node.id}')" title="${t('tHow')}">${_qhow.loading?'⏳':'💡'}</button>`;
+  row += `<button class="node-act" id="qNodeGen-${node.id}" onclick="qDecompose('${qid}','${node.id}')" title="${t('tBreakSub')}">✨</button>`;
+  row += `<button class="node-act" onclick="qAddChild('${qid}','${node.id}')" title="${t('tAddSub')}">＋</button>`;
+  row += `<button class="node-act" onclick="qDelNode('${qid}','${node.id}')" title="${t('tDelete')}">✕</button>`;
   row += '</div>';
   if(_qhow.open && _qhow.text){
-    row += `<div class="node-how"><button class="node-how-x" onclick="qHowToNode('${qid}','${node.id}')" title="Сховати">✕</button>${esc(_qhow.text)}</div>`;
+    row += `<div class="node-how"><button class="node-how-x" onclick="qHowToNode('${qid}','${node.id}')" title="${t('tHide')}">✕</button>${esc(_qhow.text)}</div>`;
   }
   if(hasKids){
     row += `<div class="node-pbar"><div class="node-pfill" style="width:${prog}%"></div></div>`;
@@ -680,7 +984,7 @@ async function genSteps(goal){
       model:"claude-haiku-4-5-20251001",
       max_tokens:1000,
       messages:[{role:"user",content:
-        `Розбий цю ціль на 4–6 конкретних, дієвих кроків українською мовою у реалістичному порядку. Ціль: "${goal}". `+
+        `Розбий цю ціль на 4–6 конкретних, дієвих кроків ${langWord()} мовою у реалістичному порядку. Ціль: "${goal}". `+
         `Зважай: це для благодійної організації, що починає з нуля, без великого бюджету — кроки мають бути практичні й посильні малими силами. `+
         profileHint()+
         `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown. `+
@@ -703,26 +1007,26 @@ async function generateQuest(manual){
   if(!goal){ input.focus(); return; }
 
   if(manual){
-    createQuest(goal, ['Перший крок до цілі']);
+    createQuest(goal, [t('firstStep')]);
     input.value='';
     return;
   }
 
   const btn = document.getElementById('genBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spin">⏳</span> Claude думає...';
+  btn.innerHTML = t('genBtnBusy');
   try{
     const steps = await genSteps(goal);
     createQuest(goal, steps);
     input.value='';
   }catch(e){
-    errEl.textContent = "Не вдалося згенерувати кроки автоматично. Створив ціль — додай кроки вручну кнопкою «+ додати крок».";
+    errEl.textContent = t('genErr');
     errEl.classList.remove('hidden');
     createQuest(goal, []);
     input.value='';
   }finally{
     btn.disabled=false;
-    btn.innerHTML='✨ Створити кроки з AI';
+    btn.innerHTML=t('genBtn');
   }
 }
 
@@ -732,7 +1036,7 @@ function createQuest(title, steps){
     steps: steps.map(t=>({id:uid(), text:t, done:false, children:[], open:true}))
   });
   save(); renderQuests();
-  toast('🎯 Нова ціль додана!');
+  toast(t('questAdded'));
 }
 
 function qToggleOpen(qid,nid){
@@ -742,17 +1046,17 @@ function qToggleOpen(qid,nid){
 }
 
 function qAddChild(qid, parentId){
-  const t = prompt(parentId ? 'Текст підкроку:' : 'Текст кроку:');
-  if(!t || !t.trim()) return;
+  const txt = prompt(parentId ? t('promptSubstep') : t('promptStep'));
+  if(!txt || !txt.trim()) return;
   const q=state.quests.find(x=>x.id===qid);
-  const node={id:uid(), text:t.trim(), done:false, children:[], open:true};
+  const node={id:uid(), text:txt.trim(), done:false, children:[], open:true};
   if(parentId){ const p=findNode(q.steps,parentId); p.children=p.children||[]; p.children.push(node); p.open=true; p.done=false; }
   else { q.steps=q.steps||[]; q.steps.push(node); }
   save(); renderQuests();
 }
 
 function qDelNode(qid,nid){
-  if(!confirm('Видалити цей крок і все під ним?')) return;
+  if(!confirm(t('confirmDelStep'))) return;
   const q=state.quests.find(x=>x.id===qid);
   removeNode(q.steps,nid);
   save(); renderQuests();
@@ -777,13 +1081,13 @@ function qToggleLeaf(qid,nid){
     state.profile.coins += QUEST_BONUS;
     state.profile.totalXp += QUEST_BONUS;
     state.profile.questsDone++;
-    toast('🏆 Ціль виконано! +'+(COIN_PER_STEP+QUEST_BONUS)+' 🪙');
+    toast(t('questDoneToast', COIN_PER_STEP+QUEST_BONUS));
   }else if(!nowComplete && wasComplete){
     state.profile.coins = Math.max(0, state.profile.coins - QUEST_BONUS);
     state.profile.totalXp = Math.max(0, state.profile.totalXp - QUEST_BONUS);
     state.profile.questsDone = Math.max(0, state.profile.questsDone-1);
   }else if(n.done){
-    toast('+'+COIN_PER_STEP+' 🪙  ⚡');
+    toast(t('coinStep'));
   }
   renderProfile(prevLevel);
   renderQuests();
@@ -805,7 +1109,7 @@ async function qHowToNode(qid, nid){
     questHow[nid] = { text:text, open:true, loading:false };
   }catch(e){
     questHow[nid] = { loading:false, open:false };
-    toast('Не вдалося отримати поради. Спробуй ще раз.');
+    toast(t('howFail'));
   }
   renderQuests();
 }
@@ -813,7 +1117,7 @@ async function qHowToNode(qid, nid){
 async function qDecompose(qid,nid){
   const q=state.quests.find(x=>x.id===qid);
   const n=findNode(q.steps,nid);
-  if(n.children && n.children.length && !confirm('Підкроки вже є. Згенерувати наново?')) return;
+  if(n.children && n.children.length && !confirm(t('confirmRegenSub'))) return;
   const btn=document.getElementById('qNodeGen-'+nid);
   if(btn){ btn.disabled=true; btn.innerHTML='⏳'; }
   try{
@@ -821,8 +1125,8 @@ async function qDecompose(qid,nid){
     const arr=await genSubSteps(q.title, path, n.text);
     n.children=arr.map(t=>({id:uid(),text:t,done:false,children:[],open:true}));
     n.done=false; n.open=true;
-    save(); renderQuests(); toast('✨ Розбито на підкроки!');
-  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); if(btn){ btn.disabled=false; btn.innerHTML='✨'; } }
+    save(); renderQuests(); toast(t('decomposed'));
+  }catch(e){ toast(t('genericFail')); if(btn){ btn.disabled=false; btn.innerHTML='✨'; } }
 }
 
 async function genSubSteps(goalTitle, path, stepText){
@@ -831,7 +1135,7 @@ async function genSubSteps(goalTitle, path, stepText){
     body:JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:1000,
       messages:[{role:"user",content:
         `У межах цілі "${goalTitle}" є крок (шлях: ${path}): "${stepText}". `+
-        `Розбий цей крок на 3–5 менших, конкретних, дієвих під-кроків українською у реалістичному порядку. Якщо крок уже зовсім дрібний — зроби 2–4 зовсім прості дії. `+
+        `Розбий цей крок на 3–5 менших, конкретних, дієвих під-кроків ${langWord()} у реалістичному порядку. Якщо крок уже зовсім дрібний — зроби 2–4 зовсім прості дії. `+
         `Зважай: це для благодійної організації, що починає з нуля, без великого бюджету. `+
         profileHint()+
         `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown.` }]
@@ -845,7 +1149,7 @@ async function genSubSteps(goalTitle, path, stepText){
 }
 
 function delQuest(qid){
-  if(!confirm('Видалити цю ціль?')) return;
+  if(!confirm(t('confirmDelQuest'))) return;
   state.quests = state.quests.filter(x=>x.id!==qid);
   save(); renderQuests();
 }
@@ -881,9 +1185,9 @@ function renderMe(){
 }
 async function getAdvice(){
   const p=profileText();
-  if(!p){ toast('Спершу опиши свої навички вище 🙂'); return; }
+  if(!p){ toast(t('adviceFirst')); return; }
   const btn=document.getElementById('adviceBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span> думаю...';
+  btn.disabled=true; btn.innerHTML=t('adviceBtnBusy');
   const goals=[...state.quests.map(q=>q.title), ...state.dreams.map(d=>d.title)].slice(0,8).join('; ');
   try{
     const res=await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
@@ -892,16 +1196,16 @@ async function getAdvice(){
         messages:[{role:"user",content:
           `Мої сильні сторони та можливості: ${p}. `+
           (goals?`Цілі, над якими я працюю: ${goals}. `:'')+
-          `Дай 3–5 конкретних порад українською, як спиратися на мої сильні сторони, щоб ефективніше досягати цілей (принцип: підсилюй сильне). `+
+          `Дай 3–5 конкретних порад ${langWord()}, як спиратися на мої сильні сторони, щоб ефективніше досягати цілей (принцип: підсилюй сильне). `+
           `Кожна порада — короткий абзац із доречним емодзі на початку. Поверни лише текст порад, без вступу й висновку.`
         }]})
     });
     const data=await res.json();
     const txt=(data.content||[]).map(i=>i.text||"").join("").trim();
-    if(txt){ state.me.advice=txt; save(); document.getElementById('adviceBox').textContent=txt; toast('✨ Порада готова!'); }
-    else toast('Не вдалося. Спробуй ще раз.');
-  }catch(e){ toast('Не вдалося отримати пораду. Спробуй ще раз.'); }
-  finally{ btn.disabled=false; btn.innerHTML='✨ Дай пораду'; }
+    if(txt){ state.me.advice=txt; save(); document.getElementById('adviceBox').textContent=txt; toast(t('adviceReady')); }
+    else toast(t('genericFail'));
+  }catch(e){ toast(t('adviceFail')); }
+  finally{ btn.disabled=false; btn.innerHTML=t('adviceBtn'); }
 }
 
 /* ================= ОПИТУВАННЯ: ВИЗНАЧЕННЯ СИЛЬНИХ СТОРІН ================= */
@@ -910,7 +1214,7 @@ let suggestedSkills = '';
 function toggleQuiz(){
   const box=document.getElementById('quizBox');
   const hidden=box.classList.toggle('hidden');
-  document.getElementById('quizToggle').textContent = hidden ? '🧭 Пройти опитування' : '🙈 Сховати опитування';
+  document.getElementById('quizToggle').textContent = hidden ? t('quizOpen') : t('quizHide');
 }
 
 async function analyzeStrengths(){
@@ -921,9 +1225,9 @@ async function analyzeStrengths(){
     ['Чим пишаюся', document.getElementById('q4').value.trim()],
     ['По що звертаються по допомогу', document.getElementById('q5').value.trim()]
   ].filter(x=>x[1]);
-  if(qs.length<2){ toast('Дай відповідь хоча б на 2 запитання 🙂'); return; }
+  if(qs.length<2){ toast(t('quizMin2')); return; }
   const btn=document.getElementById('quizBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span> аналізую...';
+  btn.disabled=true; btn.innerHTML=t('quizBtnBusy');
   const answers=qs.map(x=>x[0]+': '+x[1]).join('. ');
   try{
     const res=await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
@@ -931,7 +1235,7 @@ async function analyzeStrengths(){
       body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:300,
         messages:[{role:"user",content:
           `Людина відповіла на запитання про себе: ${answers}. `+
-          `На основі цього визнач 4–6 її сильних сторін і навичок українською. `+
+          `На основі цього визнач 4–6 її сильних сторін і навичок ${langWord()}. `+
           `Поверни ЛИШЕ перелік через кому, без вступу, без пояснень, без крапки в кінці.`
         }]})
     });
@@ -940,12 +1244,12 @@ async function analyzeStrengths(){
     if(txt){
       suggestedSkills=txt;
       document.getElementById('quizResult').innerHTML =
-        '<div class="quiz-skills">Ось що вдалося розгледіти:\n\n'+esc(txt)+'</div>'+
-        '<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="addSuggestedToSkills()">➕ Додати до моїх навичок</button>';
-      toast('✨ Готово!');
-    } else toast('Не вдалося. Спробуй ще раз.');
-  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); }
-  finally{ btn.disabled=false; btn.innerHTML='✨ Визнач мої сильні сторони'; }
+        '<div class="quiz-skills">'+t('quizResultLabel')+'\n\n'+esc(txt)+'</div>'+
+        '<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="addSuggestedToSkills()">'+t('addToSkills')+'</button>';
+      toast(t('doneShort'));
+    } else toast(t('genericFail'));
+  }catch(e){ toast(t('genericFail')); }
+  finally{ btn.disabled=false; btn.innerHTML=t('quizBtn'); }
 }
 
 function addSuggestedToSkills(){
@@ -954,7 +1258,7 @@ function addSuggestedToSkills(){
   el.value = el.value.trim() ? (el.value.trim()+', '+suggestedSkills) : suggestedSkills;
   onMeInput();
   document.getElementById('quizResult').innerHTML='';
-  toast('✅ Додано в навички!');
+  toast(t('addedToSkills'));
 }
 
 /* ================= ЩОДЕННІ ЗАДАЧІ ================= */
@@ -977,11 +1281,11 @@ function renderDaily(){
   const tasks=state.daily.tasks;
   const done=tasks.filter(t=>t.doneDate===today).length;
   const streakEl=document.getElementById('dailyStreak');
-  streakEl.innerHTML = `🔥 Серія: <b>${state.daily.streak}</b> ${plural(state.daily.streak,'день','дні','днів')} поспіль · сьогодні ${done}/${tasks.length}`;
+  streakEl.innerHTML = t('streakBanner', state.daily.streak, done, tasks.length);
 
   const wrap=document.getElementById('dailyList');
   if(tasks.length===0){
-    wrap.innerHTML='<div class="empty"><span class="big">🔁</span>Ще немає щоденних справ.<br>Додай рутину — годування, прибирання, ліки.</div>';
+    wrap.innerHTML='<div class="empty">'+t('emptyDaily')+'</div>';
     return;
   }
   wrap.innerHTML = tasks.map(t=>{
@@ -1015,7 +1319,7 @@ function toggleDaily(id){
     t.doneDate=today;
     state.profile.coins+=DAILY_COIN;
     state.profile.totalXp+=DAILY_COIN;
-    toast('+'+DAILY_COIN+' 🪙');
+    toast(t('coinPlus', DAILY_COIN));
   }
   updateStreak();
   renderProfile(prevLevel);
@@ -1032,7 +1336,7 @@ function updateStreak(){
     state.profile.totalXp+=DAILY_BONUS;
     state.daily.streak = (state.daily.lastAllDone===yesterdayStr()) ? state.daily.streak+1 : 1;
     state.daily.lastAllDone=today;
-    toast('🔥 Усі справи на сьогодні! Серія: '+state.daily.streak+' '+plural(state.daily.streak,'день','дні','днів')+' · +'+DAILY_BONUS+' 🪙', true);
+    toast(t('dailyAllDone', state.daily.streak), true);
   }
 }
 
@@ -1088,7 +1392,7 @@ function nodePath(nodes, id, trail){
 function renderDreams(){
   const el = document.getElementById('dreamList');
   if(state.dreams.length===0){
-    el.innerHTML = '<div class="empty"><span class="big">🌟</span>Ще немає великої мрії.<br>Признач масштабну мету, до якої прагнеш.</div>';
+    el.innerHTML = '<div class="empty">'+t('emptyDreams')+'</div>';
     return;
   }
   el.innerHTML = state.dreams.map(d=>{
@@ -1097,16 +1401,16 @@ function renderDreams(){
     const taskPct = st.leaves ? (st.done/st.leaves*100) : 0;
     const treeHtml = (d.nodes&&d.nodes.length)
       ? d.nodes.map(n=>renderNode(d.id,n)).join('')
-      : '<div class="tree-empty">Натисни «✨ Розбити», щоб AI поділив мрію на під-цілі — а кожну з них можна розбивати ще глибше, аж до маленьких кроків.</div>';
+      : '<div class="tree-empty">'+t('treeEmptyDream')+'</div>';
     return `<div class="dream-card">
       <div class="dream-title">${esc(d.title)}</div>
       <div class="dream-amount">${fmt(d.current)} <small>/ ${fmt(d.target)} ${esc(d.unit)}</small></div>
       <div class="dream-bar"><div class="dream-bar-fill" style="width:${pct}%"></div></div>
-      <div class="dream-pct">💰 ${pct.toFixed(1)}% зібрано${st.leaves?` · 🎯 кроків ${st.done}/${st.leaves} (${taskPct.toFixed(0)}%)`:''}</div>
+      <div class="dream-pct">${t('dreamPct', pct.toFixed(1), st.leaves, st.done, taskPct.toFixed(0))}</div>
       <div class="dream-actions">
-        <button class="btn btn-gold btn-sm" onclick="addContribution('${d.id}')">＋ Внесок</button>
-        <button class="btn btn-primary btn-sm" id="dreamGen-${d.id}" onclick="breakDream('${d.id}')">✨ Розбити</button>
-        <button class="btn btn-ghost btn-sm" onclick="addChildPrompt('${d.id}',null)">＋ Підціль</button>
+        <button class="btn btn-gold btn-sm" onclick="addContribution('${d.id}')">${t('contribBtn')}</button>
+        <button class="btn btn-primary btn-sm" id="dreamGen-${d.id}" onclick="breakDream('${d.id}')">${t('breakBtn')}</button>
+        <button class="btn btn-ghost btn-sm" onclick="addChildPrompt('${d.id}',null)">${t('subgoalBtn')}</button>
         <button class="btn btn-ghost btn-sm" onclick="openShare('${d.id}')">📤</button>
         <button class="btn btn-ghost btn-sm" onclick="delDream('${d.id}')">✕</button>
       </div>
@@ -1126,13 +1430,13 @@ function renderNode(did, node){
   row += `<div class="node-txt ${(!hasKids&&node.done)?'done':''}">${esc(node.text)}</div>`;
   if(hasKids) row += `<span class="node-prog">${s.done}/${s.leaves}</span>`;
   const _how = dreamHow[node.id] || {};
-  row += `<button class="node-act" id="nodeHow-${node.id}" onclick="howToNode('${did}','${node.id}')" title="Як це зробити?">${_how.loading?'⏳':'💡'}</button>`;
-  row += `<button class="node-act" id="nodeGen-${node.id}" onclick="decomposeNode('${did}','${node.id}')" title="Розбити глибше">✨</button>`;
-  row += `<button class="node-act" onclick="addChildPrompt('${did}','${node.id}')" title="Додати підпункт">＋</button>`;
-  row += `<button class="node-act" onclick="delNode('${did}','${node.id}')" title="Видалити">✕</button>`;
+  row += `<button class="node-act" id="nodeHow-${node.id}" onclick="howToNode('${did}','${node.id}')" title="${t('tHow')}">${_how.loading?'⏳':'💡'}</button>`;
+  row += `<button class="node-act" id="nodeGen-${node.id}" onclick="decomposeNode('${did}','${node.id}')" title="${t('tBreakDeep')}">✨</button>`;
+  row += `<button class="node-act" onclick="addChildPrompt('${did}','${node.id}')" title="${t('tAddSub')}">＋</button>`;
+  row += `<button class="node-act" onclick="delNode('${did}','${node.id}')" title="${t('tDelete')}">✕</button>`;
   row += '</div>';
   if(_how.open && _how.text){
-    row += `<div class="node-how"><button class="node-how-x" onclick="howToNode('${did}','${node.id}')" title="Сховати">✕</button>${esc(_how.text)}</div>`;
+    row += `<div class="node-how"><button class="node-how-x" onclick="howToNode('${did}','${node.id}')" title="${t('tHide')}">✕</button>${esc(_how.text)}</div>`;
   }
   if(hasKids){
     row += `<div class="node-pbar"><div class="node-pfill" style="width:${prog}%"></div></div>`;
@@ -1149,10 +1453,10 @@ function toggleOpen(did,nid){
 }
 
 function addChildPrompt(did, parentId){
-  const t = prompt(parentId ? 'Текст підпункту:' : 'Текст під-цілі:');
-  if(!t || !t.trim()) return;
+  const txt = prompt(parentId ? t('promptSubitem') : t('promptSubgoal'));
+  if(!txt || !txt.trim()) return;
   const d=state.dreams.find(x=>x.id===did);
-  const node={id:uid(), text:t.trim(), done:false, children:[], open:true};
+  const node={id:uid(), text:txt.trim(), done:false, children:[], open:true};
   if(parentId){ const p=findNode(d.nodes,parentId); p.children=p.children||[]; p.children.push(node); p.open=true; p.done=false; }
   else { d.nodes=d.nodes||[]; d.nodes.push(node); }
   save(); renderDreams();
@@ -1165,8 +1469,8 @@ function toggleLeaf(did,nid){
   if(n.done){
     state.profile.coins+=NODE_REWARD; state.profile.totalXp+=NODE_REWARD; state.profile.stepsDone++;
     const st=nodesStats(d.nodes);
-    if(st.leaves && st.done===st.leaves){ state.profile.questsDone++; toast('🏆 Усі кроки мрії пройдено!', true); }
-    else toast('+'+NODE_REWARD+' 🪙  ⚡');
+    if(st.leaves && st.done===st.leaves){ state.profile.questsDone++; toast(t('allDreamDone'), true); }
+    else toast(t('coinPlus', NODE_REWARD)+'  ⚡');
   } else {
     state.profile.coins=Math.max(0,state.profile.coins-NODE_REWARD);
     state.profile.totalXp=Math.max(0,state.profile.totalXp-NODE_REWARD);
@@ -1176,7 +1480,7 @@ function toggleLeaf(did,nid){
 }
 
 function delNode(did,nid){
-  if(!confirm('Видалити цей пункт і все під ним?')) return;
+  if(!confirm(t('confirmDelNode'))) return;
   const d=state.dreams.find(x=>x.id===did);
   removeNode(d.nodes,nid);
   save(); renderDreams();
@@ -1192,18 +1496,18 @@ function addDream(){
   document.getElementById('drTitle').value='';
   document.getElementById('drTarget').value='';
   save(); renderDreams();
-  toast('🌟 Мрію збережено!');
+  toast(t('dreamSaved'));
 }
 
 function addContribution(did){
   const d = state.dreams.find(x=>x.id===did);
-  const v = prompt('Скільки додати до прогресу? ('+d.unit+')');
+  const v = prompt(t('contribPrompt', d.unit));
   if(v===null) return;
   const amt = parseFloat(String(v).replace(/\s/g,'').replace(',','.'));
   if(isNaN(amt)) return;
   d.current = Math.max(0, d.current + amt);
   save(); renderDreams();
-  if(amt>0) toast('💪 +'+fmt(amt)+' '+d.unit+' до мрії!');
+  if(amt>0) toast(t('contribToast', fmt(amt), d.unit));
 }
 
 async function genChildren(dreamTitle, path, nodeText, isRoot, target, unit){
@@ -1214,8 +1518,8 @@ async function genChildren(dreamTitle, path, nodeText, isRoot, target, unit){
       ` Організація починає без капіталу, малими силами.`
     : `У межах великої мрії "${dreamTitle}" є така ціль (шлях: ${path}): "${nodeText}".`;
   const ask = isRoot
-    ? `Розбий цю мрію на 5–7 великих етапів українською у РЕАЛІСТИЧНІЙ послідовності від старту з нуля: спершу формалізація (реєстрація організації, звітність, прозорість), далі — створення каналів для збору коштів, формування спільноти прихильників, залучення регулярних донорів, партнерства та гранти; і лише на ОСТАННІХ етапах — саме будівництво та великі витрати.`
-    : `Розбий цю ціль на 3–5 менших, конкретніших під-кроків українською. Якщо ціль уже зовсім дрібна — зроби 2–4 простих дієвих кроки.`;
+    ? `Розбий цю мрію на 5–7 великих етапів ${langWord()} у РЕАЛІСТИЧНІЙ послідовності від старту з нуля: спершу формалізація (реєстрація організації, звітність, прозорість), далі — створення каналів для збору коштів, формування спільноти прихильників, залучення регулярних донорів, партнерства та гранти; і лише на ОСТАННІХ етапах — саме будівництво та великі витрати.`
+    : `Розбий цю ціль на 3–5 менших, конкретніших під-кроків ${langWord()}. Якщо ціль уже зовсім дрібна — зроби 2–4 простих дієвих кроки.`;
   const res = await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
     method:"POST", headers:{"Content-Type":"application/json"},
     body:JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:1000,
@@ -1233,13 +1537,13 @@ async function genChildren(dreamTitle, path, nodeText, isRoot, target, unit){
 async function breakDream(did){
   const d=state.dreams.find(x=>x.id===did);
   const btn=document.getElementById('dreamGen-'+did);
-  if((d.nodes||[]).length && !confirm('Під-цілі вже є. Згенерувати наново (замінить верхній рівень)?')) return;
+  if((d.nodes||[]).length && !confirm(t('confirmRegenDream'))) return;
   btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span>';
   try{
     const arr=await genChildren(d.title,'',d.title,true,d.target,d.unit);
     d.nodes=arr.map(t=>({id:uid(),text:t,done:false,children:[],open:true}));
-    save(); renderDreams(); toast('🗺️ Мрію розбито на під-цілі!');
-  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); btn.disabled=false; btn.innerHTML='✨ Розбити'; }
+    save(); renderDreams(); toast(t('dreamBroken'));
+  }catch(e){ toast(t('genericFail')); btn.disabled=false; btn.innerHTML=t('breakBtn'); }
 }
 
 /* ===== «Як це зробити?» — практичні поради до пункту мрії ===== */
@@ -1250,7 +1554,7 @@ async function genHowTo(itemText){
     method:"POST", headers:{"Content-Type":"application/json"},
     body:JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:600,
       messages:[{role:"user",content:
-        `Поясни простими словами, ЯК виконати цей пункт — 3–5 конкретних практичних порад українською. Це благодійна організація, що починає з нуля, без капіталу. Пункт: "${itemText}". `+
+        `Поясни простими словами, ЯК виконати цей пункт — 3–5 конкретних практичних порад ${langWord()}. Це благодійна організація, що починає з нуля, без капіталу. Пункт: "${itemText}". `+
         `Поверни лише поради (кожна — короткий рядок із доречним емодзі на початку), без вступу й висновку.` }]
     })
   });
@@ -1272,7 +1576,7 @@ async function howToNode(did, nid){
     dreamHow[nid] = { text:text, open:true, loading:false };
   }catch(e){
     dreamHow[nid] = { loading:false, open:false };
-    toast('Не вдалося отримати поради. Спробуй ще раз.');
+    toast(t('howFail'));
   }
   renderDreams();
 }
@@ -1280,7 +1584,7 @@ async function howToNode(did, nid){
 async function decomposeNode(did,nid){
   const d=state.dreams.find(x=>x.id===did);
   const n=findNode(d.nodes,nid);
-  if(n.children && n.children.length && !confirm('Підпункти вже є. Згенерувати наново?')) return;
+  if(n.children && n.children.length && !confirm(t('confirmRegenSub2'))) return;
   const btn=document.getElementById('nodeGen-'+nid);
   if(btn){ btn.disabled=true; btn.innerHTML='⏳'; }
   try{
@@ -1288,12 +1592,12 @@ async function decomposeNode(did,nid){
     const arr=await genChildren(d.title, path, n.text, false);
     n.children=arr.map(t=>({id:uid(),text:t,done:false,children:[],open:true}));
     n.done=false; n.open=true;
-    save(); renderDreams(); toast('✨ Розбито глибше!');
-  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); if(btn){ btn.disabled=false; btn.innerHTML='✨'; } }
+    save(); renderDreams(); toast(t('decomposedDeep'));
+  }catch(e){ toast(t('genericFail')); if(btn){ btn.disabled=false; btn.innerHTML='✨'; } }
 }
 
 function delDream(did){
-  if(!confirm('Видалити цю мрію?')) return;
+  if(!confirm(t('confirmDelDream'))) return;
   state.dreams = state.dreams.filter(x=>x.id!==did);
   save(); renderDreams();
 }
@@ -1340,12 +1644,12 @@ function buildCaption(){
   const d = currentDream(); if(!d) return '';
   const pct = Math.min(100,(d.current/d.target)*100).toFixed(1);
   const s = state.share || {};
-  let t = `🐾 Наша мрія: ${d.title}\n\n`;
-  t += `Уже зібрано ${fmt(d.current)} ${d.unit} з ${fmt(d.target)} ${d.unit} — це ${pct}% шляху!\n`;
-  if(s.subtitle) t += `${s.subtitle}\n`;
-  t += `\nКожен внесок наближає дім для тварин. Долучайся 💛`;
-  if(s.contact) t += `\n${s.contact}`;
-  return t;
+  let cap = t('capDream', d.title) + '\n\n';
+  cap += t('capRaised', fmt(d.current), d.unit, fmt(d.target), pct) + '\n';
+  if(s.subtitle) cap += `${s.subtitle}\n`;
+  cap += '\n' + t('capJoin');
+  if(s.contact) cap += `\n${s.contact}`;
+  return cap;
 }
 
 /* --- малювання картинки --- */
@@ -1437,7 +1741,7 @@ function drawProgressBar(ctx,barX,barY,barW,barH,pct){
 function drawSquareContent(ctx,W,H,d,s,pct){
   ctx.fillStyle='#9c3a34'; ctx.font='700 30px "Hanken Grotesk"';
   try{ ctx.letterSpacing='4px'; }catch(e){}
-  ctx.fillText((s.org||'Збір на велику мрію').toUpperCase(), W/2, 150);
+  ctx.fillText((s.org||t('cardOrgDefault')).toUpperCase(), W/2, 150);
   try{ ctx.letterSpacing='0px'; }catch(e){}
 
   ctx.font='48px "Hanken Grotesk"'; ctx.fillText('🐾', W/2, 222);
@@ -1452,7 +1756,7 @@ function drawSquareContent(ctx,W,H,d,s,pct){
 
   ctx.fillStyle='#3f5170'; ctx.font='500 40px "Hanken Grotesk"';
   let y = titleY+250+44+76;
-  ctx.fillText(`Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit}`, W/2, y);
+  ctx.fillText(t('cardRaised', fmt(d.current), fmt(d.target), d.unit), W/2, y);
 
   if(s.subtitle){
     ctx.fillStyle='#6b7d9c'; ctx.font='italic 500 36px "Hanken Grotesk"';
@@ -1460,7 +1764,7 @@ function drawSquareContent(ctx,W,H,d,s,pct){
   }
 
   ctx.fillStyle='#14233f'; ctx.font='600 50px Fraunces';
-  ctx.fillText('Долучайся до мрії 🐾', W/2, s.contact?928:958);
+  ctx.fillText(t('cardJoin'), W/2, s.contact?928:958);
   if(s.contact){
     ctx.fillStyle='#9c3a34'; ctx.font='700 38px "Hanken Grotesk"';
     ctx.fillText(s.contact, W/2, 990);
@@ -1470,7 +1774,7 @@ function drawSquareContent(ctx,W,H,d,s,pct){
 function drawStoryContent(ctx,W,H,d,s,pct){
   ctx.fillStyle='#9c3a34'; ctx.font='700 34px "Hanken Grotesk"';
   try{ ctx.letterSpacing='5px'; }catch(e){}
-  ctx.fillText((s.org||'Збір на велику мрію').toUpperCase(), W/2, 340);
+  ctx.fillText((s.org||t('cardOrgDefault')).toUpperCase(), W/2, 340);
   try{ ctx.letterSpacing='0px'; }catch(e){}
 
   ctx.font='72px "Hanken Grotesk"'; ctx.fillText('🐾', W/2, 460);
@@ -1486,7 +1790,7 @@ function drawStoryContent(ctx,W,H,d,s,pct){
 
   ctx.fillStyle='#3f5170'; ctx.font='500 48px "Hanken Grotesk"';
   let y = pctY+92+54+98;
-  ctx.fillText(`Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit}`, W/2, y);
+  ctx.fillText(t('cardRaised', fmt(d.current), fmt(d.target), d.unit), W/2, y);
 
   if(s.subtitle){
     ctx.fillStyle='#6b7d9c'; ctx.font='italic 500 42px "Hanken Grotesk"';
@@ -1494,7 +1798,7 @@ function drawStoryContent(ctx,W,H,d,s,pct){
   }
 
   ctx.fillStyle='#14233f'; ctx.font='600 60px Fraunces';
-  ctx.fillText('Долучайся до мрії 🐾', W/2, s.contact?1560:1620);
+  ctx.fillText(t('cardJoin'), W/2, s.contact?1560:1620);
   if(s.contact){
     ctx.fillStyle='#9c3a34'; ctx.font='700 46px "Hanken Grotesk"';
     ctx.fillText(s.contact, W/2, 1640);
@@ -1509,14 +1813,14 @@ function downloadShare(){
     a.href=url; a.download='mriya-'+(shareFormat==='story'?'storis':'post')+'.png';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
-    toast('⬇️ Картинку збережено!');
+    toast(t('imgSaved'));
   },'image/png');
 }
 
 async function copyCaption(){
   const txt=document.getElementById('shCaption').value;
-  try{ await navigator.clipboard.writeText(txt); toast('📋 Текст скопійовано!'); }
-  catch(e){ const ta=document.getElementById('shCaption'); ta.focus(); ta.select(); toast('Виділив текст — натисни Ctrl+C'); }
+  try{ await navigator.clipboard.writeText(txt); toast(t('copied')); }
+  catch(e){ const ta=document.getElementById('shCaption'); ta.focus(); ta.select(); toast(t('selectCtrlC')); }
 }
 
 async function aiCaption(){
@@ -1530,7 +1834,7 @@ async function aiCaption(){
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:600,
         messages:[{role:"user",content:
-          `Напиши теплий, щирий допис українською для соцмереж від благодійної організації, що рятує безпритульних тварин. `+
+          `Напиши теплий, щирий допис ${langWord()} для соцмереж від благодійної організації, що рятує безпритульних тварин. `+
           `Мрія: "${d.title}". Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit} (${pct}%). `+
           (s.subtitle?`Важлива деталь: ${s.subtitle}. `:'')+
           `Заклич людей долучитися фінансово та поширити допис. 3–5 речень, доречні емодзі, до 4 хештегів наприкінці. `+
@@ -1541,9 +1845,9 @@ async function aiCaption(){
     const data=await res.json();
     const txt=(data.content||[]).map(i=>i.text||"").join("").trim();
     if(txt) document.getElementById('shCaption').value=txt;
-    toast('✨ AI написав допис!');
-  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); }
-  finally{ btn.disabled=false; btn.innerHTML='✨ AI-допис'; }
+    toast(t('aiCaptionDone'));
+  }catch(e){ toast(t('genericFail')); }
+  finally{ btn.disabled=false; btn.innerHTML=t('aiCapBtn'); }
 }
 
 /* ================= НАГОРОДИ ================= */
@@ -1556,7 +1860,7 @@ function toggleCoinInfo(){
 function renderRewards(){
   const el = document.getElementById('rewardList');
   if(state.rewards.length===0){
-    el.innerHTML = '<div class="empty"><span class="big">🎁</span>Ще немає нагород.<br>Признач собі щось приємне за досягнення!</div>';
+    el.innerHTML = '<div class="empty">'+t('emptyRewards')+'</div>';
     return;
   }
   el.innerHTML = state.rewards.map(r=>{
@@ -1565,9 +1869,9 @@ function renderRewards(){
       <div class="emoji">${esc(r.emoji||'🎁')}</div>
       <div class="reward-info">
         <b>${esc(r.name)}</b>
-        <div class="reward-cost">${r.claimed?'✅ Отримано':r.cost+' 🪙'}</div>
+        <div class="reward-cost">${r.claimed?t('rewardClaimed'):r.cost+' 🪙'}</div>
       </div>
-      ${r.claimed?'':`<button class="btn btn-gold" ${can?'':'disabled'} onclick="claimReward('${r.id}')">Забрати</button>`}
+      ${r.claimed?'':`<button class="btn btn-gold" ${can?'':'disabled'} onclick="claimReward('${r.id}')">${t('claimBtn')}</button>`}
       <button class="mini" onclick="delReward('${r.id}')">✕</button>
     </div>`;
   }).join('');
@@ -1589,13 +1893,13 @@ function addReward(){
 function claimReward(rid){
   const r = state.rewards.find(x=>x.id===rid);
   if(state.profile.coins < r.cost) return;
-  if(!confirm(`Обміняти ${r.cost} 🪙 на «${r.name}»?`)) return;
+  if(!confirm(t('confirmClaim', r.cost, r.name))) return;
   state.profile.coins -= r.cost;
   r.claimed = true;
   renderProfile();
   renderRewards();
   save();
-  toast('🎉 Нагороду розблоковано: '+r.name, true);
+  toast(t('rewardUnlocked', r.name), true);
 }
 
 function delReward(rid){
@@ -1611,7 +1915,7 @@ function exportBackup(){
   a.href = url; a.download = 'shlyah-do-mriyi-backup-'+todayStr()+'.json';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
-  toast('💾 Резервну копію збережено!');
+  toast(t('backupSaved'));
 }
 
 function importBackup(input){
@@ -1622,7 +1926,7 @@ function importBackup(input){
     try{
       const data = JSON.parse(e.target.result);
       if(!data || typeof data!=='object' || Array.isArray(data)) throw new Error('bad');
-      if(!confirm('Відновити дані з копії? Поточний прогрес буде замінено.')){ input.value=''; return; }
+      if(!confirm(t('confirmRestore'))){ input.value=''; return; }
       state = data;
       if(!state.profile) state.profile = {totalXp:0,coins:0,questsDone:0,stepsDone:0};
       if(!state.quests)  state.quests = [];
@@ -1632,12 +1936,14 @@ function importBackup(input){
       if(!state.share)   state.share = {org:'',contact:'',subtitle:''};
       if(!state.me)      state.me = {strengths:'',interests:'',context:'',advice:''};
       if(!state.character) state.character = 'fox';
+      if(!state.lang) state.lang = 'uk';
       migrateDreams();
       save();
+      applyI18n();
       renderProfile(); renderQuests(); renderDaily(); renderDreams(); renderRewards(); renderMe();
-      toast('✅ Дані відновлено!');
+      toast(t('dataRestored'));
     }catch(err){
-      toast('Не вдалося прочитати файл копії.');
+      toast(t('backupReadFail'));
     }
     input.value='';
   };
@@ -1679,6 +1985,7 @@ function toast(msg, level){
   if(!state.share)   state.share = {org:'',contact:'',subtitle:''};
   if(!state.me)      state.me = {strengths:'',interests:'',context:'',advice:''};
   if(!state.character) state.character = 'fox';
+  if(!state.lang)    state.lang = 'uk';
   if(!state.daily)   state.daily = {tasks:[], streak:0, lastAllDone:''};
   migrateDreams();
   // якщо день пропущено — серія обнуляється
@@ -1694,13 +2001,9 @@ function toast(msg, level){
   });
   // стартові приклади нагород для першого запуску
   if(state.rewards.length===0 && state.quests.length===0 && state.dreams.length===0){
-    state.rewards = [
-      {id:uid(), name:'Замовити піцу 🍕', emoji:'🍕', cost:120, claimed:false},
-      {id:uid(), name:'Макдональдс', emoji:'🍔', cost:80, claimed:false},
-      {id:uid(), name:'Купити щось собі', emoji:'🛍️', cost:200, claimed:false},
-      {id:uid(), name:'Вечір серіалів без докорів сумління', emoji:'📺', cost:60, claimed:false}
-    ];
+    state.rewards = t('sampleRewards').map(r=>({id:uid(), name:r.name, emoji:r.emoji, cost:r.cost, claimed:false}));
   }
+  applyI18n();
   renderProfile();
   renderQuests();
   renderDaily();
