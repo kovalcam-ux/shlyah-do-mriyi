@@ -201,6 +201,9 @@
   .node-act:hover{color:var(--terra);background:#0b1322}
   .node-pbar{height:4px;background:#0a1120;border-radius:6px;overflow:hidden;margin:0 6px 5px 26px}
   .node-pfill{height:100%;background:linear-gradient(90deg,var(--gold),var(--terra));border-radius:6px;transition:width .4s}
+  .node-how{position:relative;margin:2px 6px 9px 26px;background:#0e1828;border:1px solid var(--line);border-radius:11px;padding:11px 34px 11px 13px;font-size:13.5px;line-height:1.55;color:var(--cream);white-space:pre-wrap}
+  .node-how-x{position:absolute;top:7px;right:9px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px}
+  .node-how-x:hover{color:var(--terra)}
 
   /* ===== Персонаж ===== */
   .avatar{cursor:pointer;transition:transform .15s}
@@ -1074,10 +1077,15 @@ function renderNode(did, node){
   else row += `<div class="node-box ${node.done?'done':''}" onclick="toggleLeaf('${did}','${node.id}')">${node.done?'✓':''}</div>`;
   row += `<div class="node-txt ${(!hasKids&&node.done)?'done':''}">${esc(node.text)}</div>`;
   if(hasKids) row += `<span class="node-prog">${s.done}/${s.leaves}</span>`;
+  const _how = dreamHow[node.id] || {};
+  row += `<button class="node-act" id="nodeHow-${node.id}" onclick="howToNode('${did}','${node.id}')" title="Як це зробити?">${_how.loading?'⏳':'💡'}</button>`;
   row += `<button class="node-act" id="nodeGen-${node.id}" onclick="decomposeNode('${did}','${node.id}')" title="Розбити глибше">✨</button>`;
   row += `<button class="node-act" onclick="addChildPrompt('${did}','${node.id}')" title="Додати підпункт">＋</button>`;
   row += `<button class="node-act" onclick="delNode('${did}','${node.id}')" title="Видалити">✕</button>`;
   row += '</div>';
+  if(_how.open && _how.text){
+    row += `<div class="node-how"><button class="node-how-x" onclick="howToNode('${did}','${node.id}')" title="Сховати">✕</button>${esc(_how.text)}</div>`;
+  }
   if(hasKids){
     row += `<div class="node-pbar"><div class="node-pfill" style="width:${prog}%"></div></div>`;
     if(open) row += `<div class="node-kids">${node.children.map(c=>renderNode(did,c)).join('')}</div>`;
@@ -1150,12 +1158,15 @@ function addContribution(did){
   if(amt>0) toast('💪 +'+fmt(amt)+' '+d.unit+' до мрії!');
 }
 
-async function genChildren(dreamTitle, path, nodeText, isRoot){
+async function genChildren(dreamTitle, path, nodeText, isRoot, target, unit){
+  const sum = (target!=null && target!=='') ? (fmt(target)+' '+(unit||'')).trim() : '';
   const ctx = isRoot
-    ? `Велика довгострокова мрія: "${dreamTitle}".`
+    ? `Велика довгострокова мрія благодійної організації: "${dreamTitle}".`+
+      (sum ? ` Щоб її здійснити, треба ЗІБРАТИ З НУЛЯ ${sum} — це сума пожертв, яку ще належить залучити, а НЕ наявний бюджет на витрати.` : '')+
+      ` Організація починає без капіталу, малими силами.`
     : `У межах великої мрії "${dreamTitle}" є така ціль (шлях: ${path}): "${nodeText}".`;
   const ask = isRoot
-    ? `Розбий цю мрію на 4–6 великих під-цілей українською.`
+    ? `Розбий цю мрію на 5–7 великих етапів українською у РЕАЛІСТИЧНІЙ послідовності від старту з нуля: спершу формалізація (реєстрація організації, звітність, прозорість), далі — створення каналів для збору коштів, формування спільноти прихильників, залучення регулярних донорів, партнерства та гранти; і лише на ОСТАННІХ етапах — саме будівництво та великі витрати.`
     : `Розбий цю ціль на 3–5 менших, конкретніших під-кроків українською. Якщо ціль уже зовсім дрібна — зроби 2–4 простих дієвих кроки.`;
   const res = await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
     method:"POST", headers:{"Content-Type":"application/json"},
@@ -1177,10 +1188,45 @@ async function breakDream(did){
   if((d.nodes||[]).length && !confirm('Під-цілі вже є. Згенерувати наново (замінить верхній рівень)?')) return;
   btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span>';
   try{
-    const arr=await genChildren(d.title,'',d.title,true);
+    const arr=await genChildren(d.title,'',d.title,true,d.target,d.unit);
     d.nodes=arr.map(t=>({id:uid(),text:t,done:false,children:[],open:true}));
     save(); renderDreams(); toast('🗺️ Мрію розбито на під-цілі!');
   }catch(e){ toast('Не вдалося. Спробуй ще раз.'); btn.disabled=false; btn.innerHTML='✨ Розбити'; }
+}
+
+/* ===== «Як це зробити?» — практичні поради до пункту мрії ===== */
+let dreamHow = {}; // nodeId -> { text, open, loading }
+
+async function genHowTo(itemText){
+  const res = await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:600,
+      messages:[{role:"user",content:
+        `Поясни простими словами, ЯК виконати цей пункт — 3–5 конкретних практичних порад українською. Це благодійна організація, що починає з нуля, без капіталу. Пункт: "${itemText}". `+
+        `Поверни лише поради (кожна — короткий рядок із доречним емодзі на початку), без вступу й висновку.` }]
+    })
+  });
+  const data=await res.json();
+  const txt=(data.content||[]).map(i=>i.text||"").join("").trim();
+  if(!txt) throw new Error('empty');
+  return txt;
+}
+
+async function howToNode(did, nid){
+  const cur = dreamHow[nid];
+  if(cur && cur.open){ cur.open=false; renderDreams(); return; }   // сховати повторним натисканням
+  if(cur && cur.text){ cur.open=true; renderDreams(); return; }    // показати з кешу
+  dreamHow[nid] = { loading:true, open:false };
+  renderDreams();
+  try{
+    const d=state.dreams.find(x=>x.id===did); const n=findNode(d.nodes,nid);
+    const text = await genHowTo(n.text);
+    dreamHow[nid] = { text:text, open:true, loading:false };
+  }catch(e){
+    dreamHow[nid] = { loading:false, open:false };
+    toast('Не вдалося отримати поради. Спробуй ще раз.');
+  }
+  renderDreams();
 }
 
 async function decomposeNode(did,nid){
