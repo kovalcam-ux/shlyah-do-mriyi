@@ -394,7 +394,7 @@
     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">↥ Відновити з копії</button>
     <input type="file" id="importFile" accept="application/json,.json" class="hidden" onchange="importBackup(this)">
   </div>
-  <div class="footer-note">Дані зберігаються у браузері. Час від часу зберігайте копію, щоб не втратити прогрес.</div>
+  <div class="footer-note">Прогрес зберігається автоматично (у Telegram — синхронізується між пристроями). Час від часу зберігайте копію — про всяк випадок.</div>
 
 </div>
 
@@ -1544,25 +1544,5 @@ function toast(msg, level){
   renderDreams();
   renderRewards();
   renderMe();
-
-  // ===== ТИМЧАСОВА ДІАГНОСТИКА СХОВИЩА (приберемо після перевірки) =====
-  try{
-    const tgw = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-    let cloudTest = 'нема CloudStorage';
-    if(tgw && tgw.CloudStorage){
-      cloudTest = await new Promise(res=>{
-        let done=false; const fin=v=>{ if(!done){ done=true; res(v); } };
-        try{
-          tgw.CloudStorage.setItem('__dbg','x'+Date.now(),(e)=>{
-            if(e){ fin('SET-помилка'); return; }
-            tgw.CloudStorage.getItem('__dbg',(e2,v)=>{ fin(e2?'GET-помилка':('OK='+v)); });
-          });
-        }catch(err){ fin('виняток:'+(err&&err.message)); }
-        setTimeout(()=>fin('ТАЙМАУТ(немає відповіді)'),4000);
-      });
-    }
-    const fn=document.querySelector('.footer-note');
-    if(fn) fn.textContent='🔧 DEBUG · режим='+Store.mode+' · платформа='+((tgw&&tgw.platform)||'—')+' · initData='+((tgw&&tgw.initData)?tgw.initData.length:'0')+' · CloudStorage='+(!!(tgw&&tgw.CloudStorage))+' · тест='+cloudTest;
-  }catch(e){ const fn=document.querySelector('.footer-note'); if(fn) fn.textContent='🔧 DEBUG помилка: '+(e&&e.message); }
 })();
 </script>
