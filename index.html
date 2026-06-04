@@ -553,11 +553,11 @@ function renderQuests(){
 }
 
 async function genSteps(goal){
-  const res = await fetch("https://api.anthropic.com/v1/messages",{
+  const res = await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      model:"claude-sonnet-4-20250514",
+      model:"claude-haiku-4-5-20251001",
       max_tokens:1000,
       messages:[{role:"user",content:
         `Розбий цю ціль на 4–6 конкретних, дієвих кроків українською мовою. Ціль: "${goal}". `+
@@ -701,9 +701,9 @@ async function getAdvice(){
   btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span> думаю...';
   const goals=[...state.quests.map(q=>q.title), ...state.dreams.map(d=>d.title)].slice(0,8).join('; ');
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
+    const res=await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:700,
+      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:700,
         messages:[{role:"user",content:
           `Мої сильні сторони та можливості: ${p}. `+
           (goals?`Цілі, над якими я працюю: ${goals}. `:'')+
@@ -741,9 +741,9 @@ async function analyzeStrengths(){
   btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span> аналізую...';
   const answers=qs.map(x=>x[0]+': '+x[1]).join('. ');
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
+    const res=await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,
+      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:300,
         messages:[{role:"user",content:
           `Людина відповіла на запитання про себе: ${answers}. `+
           `На основі цього визнач 4–6 її сильних сторін і навичок українською. `+
@@ -914,11 +914,11 @@ function addContribution(did){
 }
 
 async function genPhases(title, target, unit){
-  const res = await fetch("https://api.anthropic.com/v1/messages",{
+  const res = await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      model:"claude-sonnet-4-20250514",
+      model:"claude-haiku-4-5-20251001",
       max_tokens:1000,
       messages:[{role:"user",content:
         `Я маю масштабну довгострокову мрію: "${title}" (фінансова ціль: ${target} ${unit}). `+
@@ -1213,9 +1213,9 @@ async function aiCaption(){
   btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span>';
   const pct=Math.min(100,(d.current/d.target)*100).toFixed(0);
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
+    const res=await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,
+      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:600,
         messages:[{role:"user",content:
           `Напиши теплий, щирий допис українською для соцмереж від благодійної організації, що рятує безпритульних тварин. `+
           `Мрія: "${d.title}". Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit} (${pct}%). `+
