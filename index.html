@@ -600,27 +600,47 @@ function renderQuests(){
     return;
   }
   el.innerHTML = state.quests.map(q=>{
-    const total=q.steps.length, done=q.steps.filter(s=>s.done).length;
-    const complete = total>0 && done===total;
+    const st = nodesStats(q.steps);
+    const complete = st.leaves>0 && st.done===st.leaves;
+    const treeHtml = (q.steps && q.steps.length)
+      ? q.steps.map(n=>renderQuestNode(q.id,n)).join('')
+      : '<div class="tree-empty">Кроків ще немає. Додай кнопкою ＋ нижче.</div>';
     return `<div class="card">
       <div class="card-head">
         <div>
           <div class="card-title">${esc(q.title)}</div>
-          <div class="q-progress">⚡ ${done} / ${total} кроків виконано</div>
+          <div class="q-progress">⚡ ${st.done} / ${st.leaves} кроків виконано</div>
         </div>
         <button class="mini" title="Видалити" onclick="delQuest('${q.id}')">✕</button>
       </div>
-      <div class="steps">
-        ${q.steps.map(s=>`
-          <div class="step ${s.done?'done':''}" onclick="toggleStep('${q.id}','${s.id}')">
-            <div class="box">✓</div>
-            <div class="txt">${esc(s.text)}</div>
-          </div>`).join('')}
-        <div class="step" style="border-style:dashed;justify-content:center;color:var(--muted)" onclick="addStepPrompt('${q.id}')">＋ додати крок</div>
+      <div class="tree">${treeHtml}
+        <div class="node-row" style="cursor:pointer;color:var(--muted)" onclick="qAddChild('${q.id}',null)"><span style="width:18px;flex:none;text-align:center">＋</span><div class="node-txt">додати крок</div></div>
       </div>
       ${complete?`<div class="quest-done-banner">🏆 Ціль виконано! +${QUEST_BONUS} 🪙 бонус</div>`:''}
     </div>`;
   }).join('');
+}
+
+function renderQuestNode(qid, node){
+  const hasKids = node.children && node.children.length>0;
+  const open = node.open !== false;
+  const s = leafStats(node);
+  const prog = hasKids ? Math.round(s.done/s.leaves*100) : 0;
+  let row = '<div class="node"><div class="node-row">';
+  if(hasKids) row += `<button class="node-tw" onclick="qToggleOpen('${qid}','${node.id}')">${open?'▾':'▸'}</button>`;
+  else row += `<div class="node-box ${node.done?'done':''}" onclick="qToggleLeaf('${qid}','${node.id}')">${node.done?'✓':''}</div>`;
+  row += `<div class="node-txt ${(!hasKids&&node.done)?'done':''}">${esc(node.text)}</div>`;
+  if(hasKids) row += `<span class="node-prog">${s.done}/${s.leaves}</span>`;
+  row += `<button class="node-act" id="qNodeGen-${node.id}" onclick="qDecompose('${qid}','${node.id}')" title="Розбити на підкроки">✨</button>`;
+  row += `<button class="node-act" onclick="qAddChild('${qid}','${node.id}')" title="Додати підпункт">＋</button>`;
+  row += `<button class="node-act" onclick="qDelNode('${qid}','${node.id}')" title="Видалити">✕</button>`;
+  row += '</div>';
+  if(hasKids){
+    row += `<div class="node-pbar"><div class="node-pfill" style="width:${prog}%"></div></div>`;
+    if(open) row += `<div class="node-kids">${node.children.map(c=>renderQuestNode(qid,c)).join('')}</div>`;
+  }
+  row += '</div>';
+  return row;
 }
 
 async function genSteps(goal){
@@ -679,29 +699,41 @@ async function generateQuest(manual){
 function createQuest(title, steps){
   state.quests.unshift({
     id:uid(), title,
-    steps: steps.map(t=>({id:uid(), text:t, done:false}))
+    steps: steps.map(t=>({id:uid(), text:t, done:false, children:[], open:true}))
   });
   save(); renderQuests();
   toast('🎯 Нова ціль додана!');
 }
 
-function addStepPrompt(qid){
-  const t = prompt('Текст нового кроку:');
-  if(!t || !t.trim()) return;
-  const q = state.quests.find(x=>x.id===qid);
-  q.steps.push({id:uid(), text:t.trim(), done:false});
+function qToggleOpen(qid,nid){
+  const q=state.quests.find(x=>x.id===qid); const n=findNode(q.steps,nid);
+  n.open = !(n.open!==false);
   save(); renderQuests();
 }
 
-function toggleStep(qid, sid){
-  const q = state.quests.find(x=>x.id===qid);
-  const s = q.steps.find(x=>x.id===sid);
-  const wasComplete = q.steps.length>0 && q.steps.every(x=>x.done);
+function qAddChild(qid, parentId){
+  const t = prompt(parentId ? 'Текст підкроку:' : 'Текст кроку:');
+  if(!t || !t.trim()) return;
+  const q=state.quests.find(x=>x.id===qid);
+  const node={id:uid(), text:t.trim(), done:false, children:[], open:true};
+  if(parentId){ const p=findNode(q.steps,parentId); p.children=p.children||[]; p.children.push(node); p.open=true; p.done=false; }
+  else { q.steps=q.steps||[]; q.steps.push(node); }
+  save(); renderQuests();
+}
+
+function qDelNode(qid,nid){
+  if(!confirm('Видалити цей крок і все під ним?')) return;
+  const q=state.quests.find(x=>x.id===qid);
+  removeNode(q.steps,nid);
+  save(); renderQuests();
+}
+
+function qToggleLeaf(qid,nid){
+  const q=state.quests.find(x=>x.id===qid); const n=findNode(q.steps,nid);
+  const was=nodesStats(q.steps); const wasComplete = was.leaves>0 && was.done===was.leaves;
   const prevLevel = levelInfo(state.profile.totalXp).level;
-
-  s.done = !s.done;
-
-  if(s.done){
+  n.done=!n.done;
+  if(n.done){
     state.profile.coins += COIN_PER_STEP;
     state.profile.totalXp += XP_PER_STEP;
     state.profile.stepsDone++;
@@ -710,8 +742,7 @@ function toggleStep(qid, sid){
     state.profile.totalXp = Math.max(0, state.profile.totalXp - XP_PER_STEP);
     state.profile.stepsDone = Math.max(0, state.profile.stepsDone-1);
   }
-
-  const nowComplete = q.steps.length>0 && q.steps.every(x=>x.done);
+  const now=nodesStats(q.steps); const nowComplete = now.leaves>0 && now.done===now.leaves;
   if(nowComplete && !wasComplete){
     state.profile.coins += QUEST_BONUS;
     state.profile.totalXp += QUEST_BONUS;
@@ -721,13 +752,45 @@ function toggleStep(qid, sid){
     state.profile.coins = Math.max(0, state.profile.coins - QUEST_BONUS);
     state.profile.totalXp = Math.max(0, state.profile.totalXp - QUEST_BONUS);
     state.profile.questsDone = Math.max(0, state.profile.questsDone-1);
-  }else if(s.done){
+  }else if(n.done){
     toast('+'+COIN_PER_STEP+' 🪙  ⚡');
   }
-
   renderProfile(prevLevel);
   renderQuests();
   save();
+}
+
+async function qDecompose(qid,nid){
+  const q=state.quests.find(x=>x.id===qid);
+  const n=findNode(q.steps,nid);
+  if(n.children && n.children.length && !confirm('Підкроки вже є. Згенерувати наново?')) return;
+  const btn=document.getElementById('qNodeGen-'+nid);
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳'; }
+  try{
+    const path=(nodePath(q.steps,nid,[])||[]).join(' → ');
+    const arr=await genSubSteps(q.title, path, n.text);
+    n.children=arr.map(t=>({id:uid(),text:t,done:false,children:[],open:true}));
+    n.done=false; n.open=true;
+    save(); renderQuests(); toast('✨ Розбито на підкроки!');
+  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); if(btn){ btn.disabled=false; btn.innerHTML='✨'; } }
+}
+
+async function genSubSteps(goalTitle, path, stepText){
+  const res = await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:1000,
+      messages:[{role:"user",content:
+        `У межах цілі "${goalTitle}" є крок (шлях: ${path}): "${stepText}". `+
+        `Розбий цей крок на 3–5 менших, конкретних, дієвих під-кроків українською. Якщо крок уже зовсім дрібний — зроби 2–4 зовсім прості дії. `+
+        profileHint()+
+        `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown.` }]
+    })
+  });
+  const data=await res.json();
+  let txt=(data.content||[]).map(i=>i.text||"").join("").trim().replace(/```json|```/g,"").trim();
+  const arr=JSON.parse(txt);
+  if(!Array.isArray(arr)||arr.length===0) throw new Error('empty');
+  return arr;
 }
 
 function delQuest(qid){
