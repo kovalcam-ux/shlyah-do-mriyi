@@ -1,0 +1,1382 @@
+<!-- Quest Tracker — гейміфікований трекер цілей -->
+<!-- ДЛЯ TELEGRAM MINI APP: при хостингу розкоментуйте рядок нижче (у Claude/браузері він не потрібен) -->
+<!-- <script src="https://telegram.org/js/telegram-web-app.js"></script> -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- встановлення як застосунок на головний екран телефона -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Шлях Героя">
+<meta name="theme-color" content="#0b1322">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>">
+<title>Шлях Героя — трекер цілей</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0b1322;
+    --bg2:#0f1a2e;
+    --panel:#15233c;
+    --panel-2:#1b2c49;
+    --line:#2c4068;
+    --cream:#eef3fb;
+    --muted:#92a6c6;
+    --terra:#b3504a;
+    --terra-deep:#9c3a34;
+    --gold:#f0857f;
+    --green:#5fa46f;
+    --green-deep:#3f7d52;
+    --shadow:0 12px 30px rgba(0,0,0,.45);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(179,80,74,.12), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(44,64,104,.12), transparent 60%),
+      var(--bg);
+    color:var(--cream);
+    min-height:100vh;
+    padding:22px 16px 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  /* ===== Профіль ===== */
+  .hero{
+    background:linear-gradient(160deg,var(--panel-2),var(--panel));
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 22px 20px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"🐾";position:absolute;right:-10px;top:-18px;font-size:120px;opacity:.05;transform:rotate(-12deg)
+  }
+  .hero-top{display:flex;align-items:center;gap:16px;position:relative;z-index:1}
+  .avatar{
+    width:62px;height:62px;border-radius:16px;flex:none;
+    display:grid;place-items:center;font-size:30px;
+    background:radial-gradient(circle at 30% 25%, #2a3f63, #14233f);
+    border:1px solid var(--line);
+    box-shadow:inset 0 2px 6px rgba(255,255,255,.06)
+  }
+  .lvl-badge{
+    position:absolute;bottom:-6px;right:-6px;background:var(--gold);color:#14233f;
+    font-weight:700;font-size:12px;width:24px;height:24px;border-radius:50%;
+    display:grid;place-items:center;border:2px solid var(--panel)
+  }
+  .avatar-box{position:relative}
+  h1{font-family:'Fraunces',serif;font-weight:900;font-size:23px;line-height:1.1;letter-spacing:.2px}
+  h1 .sub{display:block;font-family:'Hanken Grotesk';font-weight:500;font-size:12.5px;color:var(--muted);margin-top:3px;letter-spacing:.3px}
+  .xpbar-wrap{margin-top:18px;position:relative;z-index:1}
+  .xpbar-meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+  .xpbar{height:12px;background:#0a1120;border-radius:20px;overflow:hidden;border:1px solid var(--line)}
+  .xpbar-fill{height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--terra),var(--gold));transition:width .6s cubic-bezier(.3,1.2,.5,1)}
+  .stats{display:flex;gap:10px;margin-top:16px;position:relative;z-index:1}
+  .stat{flex:1;background:#0e1828;border:1px solid var(--line);border-radius:12px;padding:11px 12px;text-align:center}
+  .stat b{font-family:'Fraunces',serif;font-size:21px;display:block;font-weight:900}
+  .stat span{font-size:11px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+  .stat.coins b{color:var(--gold)}
+
+  /* ===== Таби ===== */
+  .tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin:22px 0 16px}
+  .tab{
+    flex:1;padding:12px;border-radius:13px;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);font-weight:600;font-size:14.5px;
+    cursor:pointer;transition:.18s;font-family:inherit
+  }
+  .tab.active{background:linear-gradient(180deg,var(--terra),var(--terra-deep));color:#fff;border-color:var(--terra-deep);box-shadow:0 6px 16px rgba(156,58,52,.30)}
+
+  /* ===== Картки ===== */
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.25)
+  }
+  .card-head{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
+  .card-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;line-height:1.25;flex:1}
+  .q-progress{font-size:12px;color:var(--muted);margin-top:4px}
+  .mini{font-size:18px;line-height:1;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;transition:.15s}
+  .mini:hover{color:var(--terra);background:#0b132230}
+
+  .steps{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .step{
+    display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:12px;
+    background:#122038;border:1px solid #2a3c5e;cursor:pointer;transition:.15s;font-size:14.5px
+  }
+  .step:hover{border-color:var(--terra);transform:translateX(2px)}
+  .step .box{
+    width:22px;height:22px;border-radius:7px;border:2px solid var(--muted);flex:none;
+    display:grid;place-items:center;font-size:13px;transition:.15s;color:transparent
+  }
+  .step.done{opacity:.55}
+  .step.done .txt{text-decoration:line-through;color:var(--muted)}
+  .step.done .box{background:var(--green);border-color:var(--green);color:#fff}
+  .txt{flex:1}
+
+  .quest-done-banner{
+    margin-top:14px;padding:12px;border-radius:12px;text-align:center;font-weight:600;font-size:14px;
+    background:linear-gradient(180deg,rgba(127,174,107,.18),rgba(44,64,104,.12));
+    border:1px solid var(--green-deep);color:var(--green)
+  }
+
+  /* ===== Інпути / кнопки ===== */
+  .new-zone{background:var(--panel-2);border:1px dashed var(--line);border-radius:var(--radius);padding:18px;margin-bottom:18px}
+  .new-zone h3{font-family:'Fraunces',serif;font-size:16px;margin-bottom:4px;font-weight:600}
+  .new-zone p{font-size:13px;color:var(--muted);margin-bottom:12px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  input,textarea{
+    font-family:inherit;font-size:14.5px;background:#0c1626;color:var(--cream);
+    border:1px solid var(--line);border-radius:11px;padding:12px 14px;width:100%;outline:none;transition:.15s
+  }
+  input::placeholder,textarea::placeholder{color:#6b7d9c}
+  input:focus,textarea:focus{border-color:var(--terra);box-shadow:0 0 0 3px rgba(179,80,74,.16)}
+  .btn{
+    font-family:inherit;font-weight:600;font-size:14.5px;border:none;border-radius:11px;
+    padding:12px 18px;cursor:pointer;transition:.15s;white-space:nowrap;display:inline-flex;align-items:center;gap:7px
+  }
+  .btn-primary{background:linear-gradient(180deg,var(--terra),var(--terra-deep));color:#fff;box-shadow:0 5px 14px rgba(156,58,52,.30)}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-primary:disabled{opacity:.5;cursor:default;transform:none}
+  .btn-ghost{background:#1a2942;color:var(--cream);border:1px solid var(--line)}
+  .btn-gold{background:linear-gradient(180deg,var(--gold),#d8635c);color:#14233f}
+  .btn-gold:disabled{opacity:.4;cursor:default;filter:grayscale(.4)}
+
+  .empty{text-align:center;color:var(--muted);padding:30px 16px;font-size:14.5px}
+  .empty .big{font-size:40px;display:block;margin-bottom:8px;opacity:.6}
+
+  /* нагороди */
+  .reward{display:flex;align-items:center;gap:14px;padding:15px;border-radius:14px;background:var(--panel);border:1px solid var(--line);margin-bottom:12px}
+  .reward .emoji{font-size:30px;width:48px;text-align:center;flex:none}
+  .reward-info{flex:1}
+  .reward-info b{font-size:15.5px;font-weight:600}
+  .reward-cost{font-size:13px;color:var(--gold);margin-top:2px;font-weight:600}
+  .reward.claimed{opacity:.5}
+  .reward.claimed .reward-info b{text-decoration:line-through}
+
+  .hidden{display:none!important}
+  .spin{display:inline-block;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(40px);
+    background:var(--green);color:#fff;font-weight:600;padding:13px 22px;border-radius:30px;
+    box-shadow:var(--shadow);opacity:0;transition:.35s;z-index:99;font-size:14.5px;max-width:90%
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.level{background:var(--gold);color:#14233f}
+  .err{color:#f08a84;font-size:13px;margin-top:8px}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+  .pop{animation:pop .4s}
+
+  /* ===== Мрія ===== */
+  .dream-card{background:linear-gradient(160deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .dream-card::after{content:"🌟";position:absolute;right:-8px;top:-16px;font-size:96px;opacity:.06}
+  .dream-title{font-family:'Fraunces',serif;font-size:20px;font-weight:600;position:relative;z-index:1;padding-right:34px;line-height:1.25}
+  .dream-amount{font-family:'Fraunces',serif;font-weight:900;font-size:25px;margin-top:12px;color:var(--gold);position:relative;z-index:1}
+  .dream-amount small{font-family:'Hanken Grotesk';font-weight:500;font-size:14px;color:var(--muted)}
+  .dream-bar{height:16px;background:#0a1120;border-radius:20px;overflow:hidden;border:1px solid var(--line);margin-top:10px;position:relative;z-index:1}
+  .dream-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green-deep),var(--green),var(--gold));transition:width .7s cubic-bezier(.3,1.2,.5,1)}
+  .dream-pct{font-size:12.5px;color:var(--muted);margin-top:7px;position:relative;z-index:1}
+  .dream-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px;position:relative;z-index:1}
+  .btn-sm{padding:9px 13px;font-size:13.5px}
+  .milestone{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:12px;background:#122038;border:1px solid #2a3c5e;margin-top:8px;font-size:14px;position:relative;z-index:1}
+  .milestone .box{width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);flex:none;display:grid;place-items:center;font-size:12px;color:transparent;cursor:pointer;transition:.15s}
+  .milestone.done{opacity:.55}
+  .milestone.done .m-txt{text-decoration:line-through;color:var(--muted)}
+  .milestone.done .box{background:var(--green);border-color:var(--green);color:#fff}
+  .m-txt{flex:1}
+  .m-quest{font-size:12px;background:#1a2942;border:1px solid var(--line);color:var(--cream);padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:.15s;font-family:inherit}
+  .m-quest:hover{border-color:var(--terra);color:var(--terra)}
+
+  /* ===== Щоденні ===== */
+  .streak-banner{background:linear-gradient(160deg,#1b2c49,#15233c);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;font-size:14.5px;color:var(--gold);text-align:center}
+  .streak-banner b{font-family:'Fraunces',serif;font-size:21px}
+  .who-chip{display:inline-block;font-size:11.5px;background:#2a3c5e;border:1px solid var(--line);color:var(--muted);padding:2px 9px;border-radius:20px;margin-left:7px;vertical-align:middle}
+
+  /* ===== Навички / порада ===== */
+  .new-zone label{display:block;font-size:12.5px;color:var(--muted);margin:13px 0 5px;letter-spacing:.3px}
+  #adviceBox{margin-top:14px;white-space:pre-wrap;line-height:1.6;font-size:14.5px;color:var(--cream);background:#0e1828;border:1px solid var(--line);border-radius:13px;padding:15px}
+  #adviceBox:empty{display:none}
+  #quizResult{margin-top:14px}
+  #quizResult:empty{display:none}
+  .quiz-skills{white-space:pre-wrap;line-height:1.6;font-size:14.5px;color:var(--cream);background:#0e1828;border:1px solid var(--line);border-radius:13px;padding:15px}
+
+  /* ===== Футер / резервна копія ===== */
+  .footer-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+  .footer-note{text-align:center;font-size:12px;color:var(--muted);margin-top:11px;line-height:1.5}
+
+  /* ===== Модалка шерингу ===== */
+  .overlay{position:fixed;inset:0;background:rgba(6,12,24,.80);backdrop-filter:blur(4px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px 14px;overflow-y:auto}
+  .overlay.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;max-width:440px;width:100%;padding:22px;box-shadow:var(--shadow);margin:auto}
+  .modal h3{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:4px}
+  .modal .hint{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .canvas-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0b1322;line-height:0}
+  #shareCanvas{display:block;margin:0 auto;max-width:100%;max-height:60vh;width:auto;height:auto}
+  .fmt-toggle{display:flex;gap:8px;margin-bottom:14px}
+  .fmt-btn{flex:1;padding:10px;border-radius:11px;border:1px solid var(--line);background:#1a2942;color:var(--muted);font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.15s}
+  .fmt-btn.active{background:linear-gradient(180deg,var(--terra),var(--terra-deep));color:#fff;border-color:var(--terra-deep)}
+  .modal label{display:block;font-size:12.5px;color:var(--muted);margin:13px 0 5px;letter-spacing:.3px}
+  .modal .row{gap:8px;margin-top:16px}
+  .modal .full{width:100%}
+  .cap-box{margin-top:14px}
+  .cap-box textarea{min-height:120px;resize:vertical;line-height:1.5}
+  .close-x{float:right;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;margin:-6px -4px 0 0;line-height:1}
+  .close-x:hover{color:var(--terra)}
+</style>
+
+<div class="wrap">
+
+  <!-- ПРОФІЛЬ -->
+  <div class="hero" id="hero">
+    <div class="hero-top">
+      <div class="avatar-box">
+        <div class="avatar">🦊</div>
+        <div class="lvl-badge" id="lvlBadge">1</div>
+      </div>
+      <h1>Шлях Героя
+        <span class="sub">Перетворюй цілі на пригоди</span>
+      </h1>
+    </div>
+    <div class="xpbar-wrap">
+      <div class="xpbar-meta">
+        <span id="lvlText">Рівень 1</span>
+        <span id="xpText">0 / 100 XP</span>
+      </div>
+      <div class="xpbar"><div class="xpbar-fill" id="xpFill"></div></div>
+    </div>
+    <div class="stats">
+      <div class="stat coins"><b id="coinStat">0</b><span>🪙 монет</span></div>
+      <div class="stat"><b id="doneStat">0</b><span>✅ цілей</span></div>
+      <div class="stat"><b id="stepStat">0</b><span>⚡ кроків</span></div>
+    </div>
+  </div>
+
+  <!-- ТАБИ -->
+  <div class="tabs">
+    <button class="tab active" data-tab="quests" onclick="switchTab('quests')">🎯 Цілі</button>
+    <button class="tab" data-tab="daily" onclick="switchTab('daily')">🔁 Щодня</button>
+    <button class="tab" data-tab="dreams" onclick="switchTab('dreams')">🌟 Мрія</button>
+    <button class="tab" data-tab="rewards" onclick="switchTab('rewards')">🎁 Нагороди</button>
+    <button class="tab" data-tab="me" onclick="switchTab('me')">💪 Навички</button>
+  </div>
+
+  <!-- ===== ТАБ: НАВИЧКИ ===== -->
+  <div id="tab-me" class="hidden">
+    <div class="new-zone">
+      <h3>Мої навички та сильні сторони</h3>
+      <p>Опиши, що в тебе добре виходить, чим захоплюєшся і що маєш у запасі. AI враховуватиме це, коли розбиватиме цілі на кроки — за принципом «підсилюй сильне».</p>
+      <label>Сильні навички та вміння</label>
+      <textarea id="meStrengths" rows="3" placeholder="Напр.: добре спілкуюся з людьми, вмію фотографувати, знаю основи бухгалтерії, маю права водія" oninput="onMeInput()"></textarea>
+      <label>Захоплення та інтереси</label>
+      <textarea id="meInterests" rows="2" placeholder="Напр.: відеомонтаж, рукоділля, рослини, ведення Instagram" oninput="onMeInput()"></textarea>
+      <label>Що маю в запасі (час, контакти, ресурси)</label>
+      <textarea id="meContext" rows="2" placeholder="Напр.: знайома ветеринарка, вільні вечори, аудиторія в TikTok" oninput="onMeInput()"></textarea>
+    </div>
+    <div class="new-zone" style="border-style:solid">
+      <h3>Не знаєш свої сильні сторони?</h3>
+      <p>Відповідай на кілька простих запитань — AI допоможе їх сформулювати.</p>
+      <button class="btn btn-ghost" id="quizToggle" onclick="toggleQuiz()">🧭 Пройти опитування</button>
+      <div id="quizBox" class="hidden">
+        <label>Що тобі вдається легше, ніж іншим?</label>
+        <textarea id="q1" rows="2"></textarea>
+        <label>За що тебе зазвичай хвалять або дякують?</label>
+        <textarea id="q2" rows="2"></textarea>
+        <label>Яка справа так захоплює, що забуваєш про час?</label>
+        <textarea id="q3" rows="2"></textarea>
+        <label>Чим зі зробленого останнім часом ти пишаєшся?</label>
+        <textarea id="q4" rows="2"></textarea>
+        <label>У яких питаннях до тебе звертаються по допомогу?</label>
+        <textarea id="q5" rows="2"></textarea>
+        <button class="btn btn-primary" id="quizBtn" onclick="analyzeStrengths()" style="margin-top:12px">✨ Визнач мої сильні сторони</button>
+      </div>
+      <div id="quizResult"></div>
+    </div>
+
+    <div class="new-zone" style="border-style:solid">
+      <h3>Порада від AI</h3>
+      <p>AI подивиться на твої сильні сторони й активні цілі та підкаже, як спиратися на сильне.</p>
+      <button class="btn btn-primary" id="adviceBtn" onclick="getAdvice()">✨ Дай пораду</button>
+      <div id="adviceBox"></div>
+    </div>
+  </div>
+
+  <!-- ===== ТАБ: ЩОДНЯ ===== -->
+  <div id="tab-daily" class="hidden">
+    <div class="streak-banner" id="dailyStreak"></div>
+    <div class="new-zone">
+      <h3>Щоденна справа</h3>
+      <p>Рутина, що скидається щоранку: годування, прибирання, ліки. Можна позначити, хто відповідає.</p>
+      <input id="dlText" placeholder="Напр.: Погодувати собак (ранок)" style="margin-bottom:8px">
+      <div class="row">
+        <input id="dlWho" placeholder="Хто? (Я / Дружина / Волонтер)" style="flex:1;min-width:150px">
+        <button class="btn btn-primary" onclick="addDaily()">＋ Додати</button>
+      </div>
+    </div>
+    <div id="dailyList"></div>
+  </div>
+
+  <!-- ===== ТАБ: МРІЯ ===== -->
+  <div id="tab-dreams" class="hidden">
+    <div class="new-zone">
+      <h3>Велика мрія</h3>
+      <p>Признач масштабну мету — навіть без кроків. Відстежуй прогрес у сумі, а коли будеш готовий — розбий її на етапи.</p>
+      <input id="drTitle" placeholder="Напр.: Комплекс для порятунку тварин" style="margin-bottom:8px">
+      <div class="row">
+        <input id="drTarget" type="number" min="1" placeholder="Сума цілі (18000000)" style="flex:1;min-width:150px">
+        <input id="drUnit" placeholder="Валюта" value="$" style="flex:0 0 110px">
+        <button class="btn btn-primary" onclick="addDream()">＋ Додати мрію</button>
+      </div>
+    </div>
+    <div id="dreamList"></div>
+  </div>
+
+  <!-- ===== ТАБ: ЦІЛІ ===== -->
+  <div id="tab-quests">
+    <div class="new-zone">
+      <h3>Нова ціль</h3>
+      <p>Опиши, чого хочеш досягти — Claude розіб'є це на чіткі кроки.</p>
+      <textarea id="goalInput" rows="2" placeholder="Напр.: Знайти 5 нових волонтерів для притулку"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn btn-primary" id="genBtn" onclick="generateQuest()">✨ Створити кроки з AI</button>
+        <button class="btn btn-ghost" onclick="generateQuest(true)">✍️ Додати вручну</button>
+      </div>
+      <div class="err hidden" id="genErr"></div>
+    </div>
+    <div id="questList"></div>
+  </div>
+
+  <!-- ===== ТАБ: НАГОРОДИ ===== -->
+  <div id="tab-rewards" class="hidden">
+    <div class="new-zone">
+      <h3>Нова нагорода</h3>
+      <p>Признач собі винагороду за виконані цілі — заробляй монети й обмінюй їх.</p>
+      <input id="rwName" placeholder="Напр.: Замовити піцу 🍕" style="margin-bottom:8px">
+      <div class="row">
+        <input id="rwEmoji" placeholder="Емодзі (🍕)" style="flex:0 0 110px">
+        <input id="rwCost" type="number" min="1" placeholder="Ціна в 🪙" style="flex:1">
+        <button class="btn btn-primary" onclick="addReward()">＋ Додати</button>
+      </div>
+    </div>
+    <div id="rewardList"></div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn btn-ghost btn-sm" onclick="exportBackup()">💾 Зберегти копію</button>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">↥ Відновити з копії</button>
+    <input type="file" id="importFile" accept="application/json,.json" class="hidden" onchange="importBackup(this)">
+  </div>
+  <div class="footer-note">Дані зберігаються у браузері. Час від часу зберігайте копію, щоб не втратити прогрес.</div>
+
+</div>
+
+<!-- ===== МОДАЛКА: ПОДІЛИТИСЯ ===== -->
+<div class="overlay" id="shareOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeShare()">✕</button>
+    <h3>Поділитися прогресом</h3>
+    <p class="hint">Готова картинка для Instagram / Facebook. Обери формат, заповни підписи — і збережи або скопіюй текст.</p>
+
+    <div class="fmt-toggle">
+      <button class="fmt-btn active" data-fmt="square" onclick="setShareFormat('square')">⬛ Пост 1:1</button>
+      <button class="fmt-btn" data-fmt="story" onclick="setShareFormat('story')">📱 Сторіз 9:16</button>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="shareCanvas" width="1080" height="1080"></canvas>
+    </div>
+
+    <label>Назва фонду / підпис зверху</label>
+    <input class="full" id="shOrg" placeholder="Напр.: Прихисток для тварин «Лапа»" oninput="onShareInput()">
+
+    <label>Додатковий рядок (необов'язково)</label>
+    <input class="full" id="shSubtitle" placeholder="Напр.: 70 собак і 80 котів чекають на дім" oninput="onShareInput()">
+
+    <label>Контакт для допомоги</label>
+    <input class="full" id="shContact" placeholder="Напр.: @lapa_shelter або картка 0000 0000 0000 0000" oninput="onShareInput()">
+
+    <div class="row">
+      <button class="btn btn-primary full" onclick="downloadShare()">⬇️ Завантажити картинку</button>
+    </div>
+
+    <div class="cap-box">
+      <label>Текст допису</label>
+      <textarea class="full" id="shCaption" placeholder="Тут з'явиться готовий текст..."></textarea>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" onclick="copyCaption()">📋 Скопіювати текст</button>
+        <button class="btn btn-gold btn-sm" id="aiCapBtn" onclick="aiCaption()">✨ AI-допис</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= СТАН ================= */
+const COIN_PER_STEP = 20;
+const XP_PER_STEP = 20;
+const QUEST_BONUS = 60;
+
+let state = {
+  profile:{ totalXp:0, coins:0, questsDone:0, stepsDone:0 },
+  quests:[],
+  daily:{ tasks:[], streak:0, lastAllDone:'' },
+  dreams:[],
+  rewards:[],
+  me:{ strengths:'', interests:'', context:'', advice:'' },
+  share:{ org:'', contact:'', subtitle:'' }
+};
+/* ====== Універсальне сховище ======
+   Працює в трьох середовищах:
+   • Telegram Mini App  → Telegram CloudStorage (синхрон між пристроями)
+   • перегляд у Claude  → window.storage
+   • звичайний сайт     → localStorage
+   Якщо нічого з цього недоступне — тимчасова памʼять. */
+const Store = (function(){
+  const PREFIX='qs', CHUNK=3500;
+  const tg = (typeof window!=='undefined' && window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+  const cloud = (tg && tg.CloudStorage) ? tg.CloudStorage : null;
+  function hasClaude(){ return typeof window!=='undefined' && window.storage && typeof window.storage.get==='function'; }
+  function hasLocal(){ try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; } }
+  const mode = cloud ? 'telegram' : (hasClaude() ? 'claude' : (hasLocal() ? 'local' : 'memory'));
+  const mem = {};
+
+  function rawGet(key){
+    return new Promise(res=>{
+      try{
+        if(mode==='telegram') cloud.getItem(key,(e,v)=>res(e?null:(v||null)));
+        else if(mode==='claude') window.storage.get(key).then(r=>res(r&&r.value!=null?r.value:null)).catch(()=>res(null));
+        else if(mode==='local') res(localStorage.getItem(key));
+        else res(mem[key]!=null?mem[key]:null);
+      }catch(e){ res(null); }
+    });
+  }
+  function rawSet(key,val){
+    return new Promise(res=>{
+      try{
+        if(mode==='telegram') cloud.setItem(key,val,()=>res());
+        else if(mode==='claude') window.storage.set(key,val).then(()=>res()).catch(()=>res());
+        else if(mode==='local'){ localStorage.setItem(key,val); res(); }
+        else { mem[key]=val; res(); }
+      }catch(e){ res(); }
+    });
+  }
+  // дані ріжемо на шматки (~3.5КБ) — Telegram має ліміт на розмір значення
+  async function getState(){
+    const n=parseInt(await rawGet(PREFIX+'_n'),10);
+    if(!n || isNaN(n)) return null;
+    let s='';
+    for(let i=0;i<n;i++){ const c=await rawGet(PREFIX+'_'+i); if(c==null) return null; s+=c; }
+    return s;
+  }
+  async function setState(value){
+    const n=Math.max(1, Math.ceil(value.length/CHUNK));
+    await rawSet(PREFIX+'_n', String(n));
+    for(let i=0;i<n;i++){ await rawSet(PREFIX+'_'+i, value.slice(i*CHUNK,(i+1)*CHUNK)); }
+  }
+  return { getState, setState, rawGet, mode };
+})();
+
+async function save(){ try{ await Store.setState(JSON.stringify(state)); }catch(e){} }
+async function load(){
+  try{
+    let v = await Store.getState();
+    if(!v){ const old = await Store.rawGet('quest-state'); if(old) v=old; } // міграція зі старого формату
+    if(v) state = JSON.parse(v);
+  }catch(e){}
+}
+
+/* ================= РІВНІ ================= */
+function levelInfo(xp){
+  let level=1, need=100, acc=0;
+  while(xp >= acc+need){ acc+=need; level++; need = 100 + (level-1)*40; }
+  return { level, into: xp-acc, need };
+}
+
+/* ================= РЕНДЕР ПРОФІЛЮ ================= */
+function renderProfile(prevLevel){
+  const p = state.profile;
+  const li = levelInfo(p.totalXp);
+  document.getElementById('lvlBadge').textContent = li.level;
+  document.getElementById('lvlText').textContent = 'Рівень ' + li.level;
+  document.getElementById('xpText').textContent = li.into + ' / ' + li.need + ' XP';
+  document.getElementById('xpFill').style.width = Math.min(100,(li.into/li.need)*100) + '%';
+  document.getElementById('coinStat').textContent = p.coins;
+  document.getElementById('doneStat').textContent = p.questsDone;
+  document.getElementById('stepStat').textContent = p.stepsDone;
+  if(prevLevel!==undefined && li.level>prevLevel){
+    toast('🎉 Новий рівень ' + li.level + '! Так тримати!', true);
+    document.getElementById('hero').classList.add('pop');
+    setTimeout(()=>document.getElementById('hero').classList.remove('pop'),400);
+  }
+}
+
+/* ================= ЦІЛІ ================= */
+function renderQuests(){
+  const el = document.getElementById('questList');
+  if(state.quests.length===0){
+    el.innerHTML = '<div class="empty"><span class="big">🗺️</span>Поки що немає цілей.<br>Створи першу — і вирушай у пригоду!</div>';
+    return;
+  }
+  el.innerHTML = state.quests.map(q=>{
+    const total=q.steps.length, done=q.steps.filter(s=>s.done).length;
+    const complete = total>0 && done===total;
+    return `<div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">${esc(q.title)}</div>
+          <div class="q-progress">⚡ ${done} / ${total} кроків виконано</div>
+        </div>
+        <button class="mini" title="Видалити" onclick="delQuest('${q.id}')">✕</button>
+      </div>
+      <div class="steps">
+        ${q.steps.map(s=>`
+          <div class="step ${s.done?'done':''}" onclick="toggleStep('${q.id}','${s.id}')">
+            <div class="box">✓</div>
+            <div class="txt">${esc(s.text)}</div>
+          </div>`).join('')}
+        <div class="step" style="border-style:dashed;justify-content:center;color:var(--muted)" onclick="addStepPrompt('${q.id}')">＋ додати крок</div>
+      </div>
+      ${complete?`<div class="quest-done-banner">🏆 Ціль виконано! +${QUEST_BONUS} 🪙 бонус</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function genSteps(goal){
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",
+      max_tokens:1000,
+      messages:[{role:"user",content:
+        `Розбий цю ціль на 4–6 конкретних, дієвих кроків українською мовою. Ціль: "${goal}". `+
+        profileHint()+
+        `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown. `+
+        `Приклад формату: ["крок один","крок два"]`
+      }]
+    })
+  });
+  const data = await res.json();
+  let txt = (data.content||[]).map(i=>i.text||"").join("").trim().replace(/```json|```/g,"").trim();
+  const steps = JSON.parse(txt);
+  if(!Array.isArray(steps) || steps.length===0) throw new Error("empty");
+  return steps;
+}
+
+async function generateQuest(manual){
+  const input = document.getElementById('goalInput');
+  const goal = input.value.trim();
+  const errEl = document.getElementById('genErr');
+  errEl.classList.add('hidden');
+  if(!goal){ input.focus(); return; }
+
+  if(manual){
+    createQuest(goal, ['Перший крок до цілі']);
+    input.value='';
+    return;
+  }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⏳</span> Claude думає...';
+  try{
+    const steps = await genSteps(goal);
+    createQuest(goal, steps);
+    input.value='';
+  }catch(e){
+    errEl.textContent = "Не вдалося згенерувати кроки автоматично. Створив ціль — додай кроки вручну кнопкою «+ додати крок».";
+    errEl.classList.remove('hidden');
+    createQuest(goal, []);
+    input.value='';
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='✨ Створити кроки з AI';
+  }
+}
+
+function createQuest(title, steps){
+  state.quests.unshift({
+    id:uid(), title,
+    steps: steps.map(t=>({id:uid(), text:t, done:false}))
+  });
+  save(); renderQuests();
+  toast('🎯 Нова ціль додана!');
+}
+
+function addStepPrompt(qid){
+  const t = prompt('Текст нового кроку:');
+  if(!t || !t.trim()) return;
+  const q = state.quests.find(x=>x.id===qid);
+  q.steps.push({id:uid(), text:t.trim(), done:false});
+  save(); renderQuests();
+}
+
+function toggleStep(qid, sid){
+  const q = state.quests.find(x=>x.id===qid);
+  const s = q.steps.find(x=>x.id===sid);
+  const wasComplete = q.steps.length>0 && q.steps.every(x=>x.done);
+  const prevLevel = levelInfo(state.profile.totalXp).level;
+
+  s.done = !s.done;
+
+  if(s.done){
+    state.profile.coins += COIN_PER_STEP;
+    state.profile.totalXp += XP_PER_STEP;
+    state.profile.stepsDone++;
+  }else{
+    state.profile.coins = Math.max(0, state.profile.coins - COIN_PER_STEP);
+    state.profile.totalXp = Math.max(0, state.profile.totalXp - XP_PER_STEP);
+    state.profile.stepsDone = Math.max(0, state.profile.stepsDone-1);
+  }
+
+  const nowComplete = q.steps.length>0 && q.steps.every(x=>x.done);
+  if(nowComplete && !wasComplete){
+    state.profile.coins += QUEST_BONUS;
+    state.profile.totalXp += QUEST_BONUS;
+    state.profile.questsDone++;
+    toast('🏆 Ціль виконано! +'+(COIN_PER_STEP+QUEST_BONUS)+' 🪙');
+  }else if(!nowComplete && wasComplete){
+    state.profile.coins = Math.max(0, state.profile.coins - QUEST_BONUS);
+    state.profile.totalXp = Math.max(0, state.profile.totalXp - QUEST_BONUS);
+    state.profile.questsDone = Math.max(0, state.profile.questsDone-1);
+  }else if(s.done){
+    toast('+'+COIN_PER_STEP+' 🪙  ⚡');
+  }
+
+  renderProfile(prevLevel);
+  renderQuests();
+  save();
+}
+
+function delQuest(qid){
+  if(!confirm('Видалити цю ціль?')) return;
+  state.quests = state.quests.filter(x=>x.id!==qid);
+  save(); renderQuests();
+}
+
+/* ================= НАВИЧКИ / ПРОФІЛЬ ================= */
+function profileText(){
+  const me=state.me||{};
+  const parts=[];
+  if(me.strengths && me.strengths.trim()) parts.push('сильні навички — '+me.strengths.trim());
+  if(me.interests && me.interests.trim()) parts.push('захоплення — '+me.interests.trim());
+  if(me.context && me.context.trim()) parts.push('ресурси — '+me.context.trim());
+  return parts.join('; ');
+}
+function profileHint(){
+  const p=profileText();
+  return p ? `Враховуй мої сильні сторони й по можливості спирайся на них (принцип: підсилюй сильне): ${p}. ` : '';
+}
+function onMeInput(){
+  state.me = {
+    strengths: document.getElementById('meStrengths').value,
+    interests: document.getElementById('meInterests').value,
+    context: document.getElementById('meContext').value,
+    advice: (state.me && state.me.advice) || ''
+  };
+  save();
+}
+function renderMe(){
+  const me=state.me||{};
+  document.getElementById('meStrengths').value = me.strengths||'';
+  document.getElementById('meInterests').value = me.interests||'';
+  document.getElementById('meContext').value = me.context||'';
+  document.getElementById('adviceBox').textContent = me.advice||'';
+}
+async function getAdvice(){
+  const p=profileText();
+  if(!p){ toast('Спершу опиши свої навички вище 🙂'); return; }
+  const btn=document.getElementById('adviceBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span> думаю...';
+  const goals=[...state.quests.map(q=>q.title), ...state.dreams.map(d=>d.title)].slice(0,8).join('; ');
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:700,
+        messages:[{role:"user",content:
+          `Мої сильні сторони та можливості: ${p}. `+
+          (goals?`Цілі, над якими я працюю: ${goals}. `:'')+
+          `Дай 3–5 конкретних порад українською, як спиратися на мої сильні сторони, щоб ефективніше досягати цілей (принцип: підсилюй сильне). `+
+          `Кожна порада — короткий абзац із доречним емодзі на початку. Поверни лише текст порад, без вступу й висновку.`
+        }]})
+    });
+    const data=await res.json();
+    const txt=(data.content||[]).map(i=>i.text||"").join("").trim();
+    if(txt){ state.me.advice=txt; save(); document.getElementById('adviceBox').textContent=txt; toast('✨ Порада готова!'); }
+    else toast('Не вдалося. Спробуй ще раз.');
+  }catch(e){ toast('Не вдалося отримати пораду. Спробуй ще раз.'); }
+  finally{ btn.disabled=false; btn.innerHTML='✨ Дай пораду'; }
+}
+
+/* ================= ОПИТУВАННЯ: ВИЗНАЧЕННЯ СИЛЬНИХ СТОРІН ================= */
+let suggestedSkills = '';
+
+function toggleQuiz(){
+  const box=document.getElementById('quizBox');
+  const hidden=box.classList.toggle('hidden');
+  document.getElementById('quizToggle').textContent = hidden ? '🧭 Пройти опитування' : '🙈 Сховати опитування';
+}
+
+async function analyzeStrengths(){
+  const qs=[
+    ['Що вдається легше за інших', document.getElementById('q1').value.trim()],
+    ['За що хвалять або дякують', document.getElementById('q2').value.trim()],
+    ['Захоплює так, що забуваю про час', document.getElementById('q3').value.trim()],
+    ['Чим пишаюся', document.getElementById('q4').value.trim()],
+    ['По що звертаються по допомогу', document.getElementById('q5').value.trim()]
+  ].filter(x=>x[1]);
+  if(qs.length<2){ toast('Дай відповідь хоча б на 2 запитання 🙂'); return; }
+  const btn=document.getElementById('quizBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span> аналізую...';
+  const answers=qs.map(x=>x[0]+': '+x[1]).join('. ');
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,
+        messages:[{role:"user",content:
+          `Людина відповіла на запитання про себе: ${answers}. `+
+          `На основі цього визнач 4–6 її сильних сторін і навичок українською. `+
+          `Поверни ЛИШЕ перелік через кому, без вступу, без пояснень, без крапки в кінці.`
+        }]})
+    });
+    const data=await res.json();
+    const txt=(data.content||[]).map(i=>i.text||"").join("").trim().replace(/^["']|["']$/g,'');
+    if(txt){
+      suggestedSkills=txt;
+      document.getElementById('quizResult').innerHTML =
+        '<div class="quiz-skills">Ось що вдалося розгледіти:\n\n'+esc(txt)+'</div>'+
+        '<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="addSuggestedToSkills()">➕ Додати до моїх навичок</button>';
+      toast('✨ Готово!');
+    } else toast('Не вдалося. Спробуй ще раз.');
+  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); }
+  finally{ btn.disabled=false; btn.innerHTML='✨ Визнач мої сильні сторони'; }
+}
+
+function addSuggestedToSkills(){
+  if(!suggestedSkills) return;
+  const el=document.getElementById('meStrengths');
+  el.value = el.value.trim() ? (el.value.trim()+', '+suggestedSkills) : suggestedSkills;
+  onMeInput();
+  document.getElementById('quizResult').innerHTML='';
+  toast('✅ Додано в навички!');
+}
+
+/* ================= ЩОДЕННІ ЗАДАЧІ ================= */
+const DAILY_COIN = 10;
+const DAILY_BONUS = 30;
+
+function dateStr(d){ const x=d||new Date(); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+function todayStr(){ return dateStr(); }
+function yesterdayStr(){ const d=new Date(); d.setDate(d.getDate()-1); return dateStr(d); }
+function plural(n,one,few,many){
+  const a=Math.abs(n)%100, b=a%10;
+  if(a>10&&a<20) return many;
+  if(b>1&&b<5) return few;
+  if(b===1) return one;
+  return many;
+}
+
+function renderDaily(){
+  const today=todayStr();
+  const tasks=state.daily.tasks;
+  const done=tasks.filter(t=>t.doneDate===today).length;
+  const streakEl=document.getElementById('dailyStreak');
+  streakEl.innerHTML = `🔥 Серія: <b>${state.daily.streak}</b> ${plural(state.daily.streak,'день','дні','днів')} поспіль · сьогодні ${done}/${tasks.length}`;
+
+  const wrap=document.getElementById('dailyList');
+  if(tasks.length===0){
+    wrap.innerHTML='<div class="empty"><span class="big">🔁</span>Ще немає щоденних справ.<br>Додай рутину — годування, прибирання, ліки.</div>';
+    return;
+  }
+  wrap.innerHTML = tasks.map(t=>{
+    const isDone=t.doneDate===today;
+    return `<div class="step ${isDone?'done':''}" onclick="toggleDaily('${t.id}')" style="margin-bottom:8px">
+      <div class="box">✓</div>
+      <div class="txt">${esc(t.text)}${t.who?`<span class="who-chip">${esc(t.who)}</span>`:''}</div>
+      <button class="mini" onclick="event.stopPropagation();delDaily('${t.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function addDaily(){
+  const text=document.getElementById('dlText').value.trim();
+  const who=document.getElementById('dlWho').value.trim();
+  if(!text){ document.getElementById('dlText').focus(); return; }
+  state.daily.tasks.push({id:uid(), text, who, doneDate:''});
+  document.getElementById('dlText').value='';
+  save(); renderDaily();
+}
+
+function toggleDaily(id){
+  const t=state.daily.tasks.find(x=>x.id===id);
+  const today=todayStr();
+  const prevLevel=levelInfo(state.profile.totalXp).level;
+  if(t.doneDate===today){
+    t.doneDate='';
+    state.profile.coins=Math.max(0,state.profile.coins-DAILY_COIN);
+    state.profile.totalXp=Math.max(0,state.profile.totalXp-DAILY_COIN);
+  }else{
+    t.doneDate=today;
+    state.profile.coins+=DAILY_COIN;
+    state.profile.totalXp+=DAILY_COIN;
+    toast('+'+DAILY_COIN+' 🪙');
+  }
+  updateStreak();
+  renderProfile(prevLevel);
+  renderDaily();
+  save();
+}
+
+function updateStreak(){
+  const today=todayStr();
+  const tasks=state.daily.tasks;
+  const allDone = tasks.length>0 && tasks.every(t=>t.doneDate===today);
+  if(allDone && state.daily.lastAllDone!==today){
+    state.profile.coins+=DAILY_BONUS;
+    state.profile.totalXp+=DAILY_BONUS;
+    state.daily.streak = (state.daily.lastAllDone===yesterdayStr()) ? state.daily.streak+1 : 1;
+    state.daily.lastAllDone=today;
+    toast('🔥 Усі справи на сьогодні! Серія: '+state.daily.streak+' '+plural(state.daily.streak,'день','дні','днів')+' · +'+DAILY_BONUS+' 🪙', true);
+  }
+}
+
+function delDaily(id){
+  state.daily.tasks=state.daily.tasks.filter(x=>x.id!==id);
+  save(); renderDaily();
+}
+
+/* ================= МРІЯ ================= */
+const MILESTONE_REWARD = 40;
+
+function renderDreams(){
+  const el = document.getElementById('dreamList');
+  if(state.dreams.length===0){
+    el.innerHTML = '<div class="empty"><span class="big">🌟</span>Ще немає великої мрії.<br>Признач масштабну мету, до якої прагнеш.</div>';
+    return;
+  }
+  el.innerHTML = state.dreams.map(d=>{
+    const pct = Math.min(100,(d.current/d.target)*100);
+    const mdone = d.milestones.filter(m=>m.done).length;
+    return `<div class="dream-card">
+      <div class="dream-title">${esc(d.title)}</div>
+      <div class="dream-amount">${fmt(d.current)} <small>/ ${fmt(d.target)} ${esc(d.unit)}</small></div>
+      <div class="dream-bar"><div class="dream-bar-fill" style="width:${pct}%"></div></div>
+      <div class="dream-pct">${pct.toFixed(1)}% досягнуто${d.milestones.length?` · етапів: ${mdone}/${d.milestones.length}`:''}</div>
+      <div class="dream-actions">
+        <button class="btn btn-gold btn-sm" onclick="addContribution('${d.id}')">＋ Внесок</button>
+        <button class="btn btn-primary btn-sm" id="dreamGen-${d.id}" onclick="breakDream('${d.id}')">✨ Розбити на етапи</button>
+        <button class="btn btn-ghost btn-sm" onclick="openShare('${d.id}')">📤 Поділитися</button>
+        <button class="btn btn-ghost btn-sm" onclick="delDream('${d.id}')">✕</button>
+      </div>
+      ${d.milestones.map(m=>`
+        <div class="milestone ${m.done?'done':''}">
+          <div class="box" onclick="toggleMilestone('${d.id}','${m.id}')">✓</div>
+          <div class="m-txt">${esc(m.text)}</div>
+          <button class="m-quest" onclick="milestoneToQuest('${d.id}','${m.id}')">🎯 зробити ціллю</button>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function addDream(){
+  const title = document.getElementById('drTitle').value.trim();
+  const target = parseFloat(document.getElementById('drTarget').value);
+  const unit = document.getElementById('drUnit').value.trim() || '$';
+  if(!title){ document.getElementById('drTitle').focus(); return; }
+  if(!target || target<=0){ document.getElementById('drTarget').focus(); return; }
+  state.dreams.unshift({id:uid(), title, target, current:0, unit, milestones:[]});
+  document.getElementById('drTitle').value='';
+  document.getElementById('drTarget').value='';
+  save(); renderDreams();
+  toast('🌟 Мрію збережено!');
+}
+
+function addContribution(did){
+  const d = state.dreams.find(x=>x.id===did);
+  const v = prompt('Скільки додати до прогресу? ('+d.unit+')');
+  if(v===null) return;
+  const amt = parseFloat(String(v).replace(/\s/g,'').replace(',','.'));
+  if(isNaN(amt)) return;
+  d.current = Math.max(0, d.current + amt);
+  save(); renderDreams();
+  if(amt>0) toast('💪 +'+fmt(amt)+' '+d.unit+' до мрії!');
+}
+
+async function genPhases(title, target, unit){
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",
+      max_tokens:1000,
+      messages:[{role:"user",content:
+        `Я маю масштабну довгострокову мрію: "${title}" (фінансова ціль: ${target} ${unit}). `+
+        `Розбий її на 5–7 великих стратегічних етапів українською — логічна послідовність від старту до повної реалізації. `+
+        profileHint()+
+        `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown.`
+      }]
+    })
+  });
+  const data = await res.json();
+  let txt = (data.content||[]).map(i=>i.text||"").join("").trim().replace(/```json|```/g,"").trim();
+  const arr = JSON.parse(txt);
+  if(!Array.isArray(arr) || arr.length===0) throw new Error("empty");
+  return arr;
+}
+
+async function breakDream(did){
+  const d = state.dreams.find(x=>x.id===did);
+  const btn = document.getElementById('dreamGen-'+did);
+  if(d.milestones.length && !confirm('Етапи вже є. Згенерувати наново (замінить поточні)?')) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⏳</span> думаю...';
+  try{
+    const phases = await genPhases(d.title, d.target, d.unit);
+    d.milestones = phases.map(t=>({id:uid(), text:t, done:false}));
+    save(); renderDreams();
+    toast('🗺️ Мрію розбито на етапи!');
+  }catch(e){
+    toast('Не вдалося згенерувати. Спробуй ще раз.');
+    btn.disabled = false;
+    btn.innerHTML = '✨ Розбити на етапи';
+  }
+}
+
+function toggleMilestone(did, mid){
+  const d = state.dreams.find(x=>x.id===did);
+  const m = d.milestones.find(x=>x.id===mid);
+  const prevLevel = levelInfo(state.profile.totalXp).level;
+  m.done = !m.done;
+  if(m.done){
+    state.profile.coins += MILESTONE_REWARD;
+    state.profile.totalXp += MILESTONE_REWARD;
+    toast('🌟 Етап мрії пройдено! +'+MILESTONE_REWARD+' 🪙');
+  }else{
+    state.profile.coins = Math.max(0, state.profile.coins - MILESTONE_REWARD);
+    state.profile.totalXp = Math.max(0, state.profile.totalXp - MILESTONE_REWARD);
+  }
+  renderProfile(prevLevel); renderDreams(); save();
+}
+
+async function milestoneToQuest(did, mid){
+  const d = state.dreams.find(x=>x.id===did);
+  const m = d.milestones.find(x=>x.id===mid);
+  switchTab('quests');
+  toast('🎯 Створюю ціль з етапу...');
+  let steps = [];
+  try{ steps = await genSteps(m.text); }catch(e){ steps = []; }
+  createQuest(m.text, steps);
+}
+
+function delDream(did){
+  if(!confirm('Видалити цю мрію?')) return;
+  state.dreams = state.dreams.filter(x=>x.id!==did);
+  save(); renderDreams();
+}
+
+/* ================= ШЕРИНГ ================= */
+let shareDreamId = null;
+let shareFormat = 'square';
+
+function currentDream(){ return state.dreams.find(d=>d.id===shareDreamId); }
+
+function setShareFormat(f){
+  shareFormat = f;
+  document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.toggle('active', b.dataset.fmt===f));
+  const c = document.getElementById('shareCanvas');
+  if(f==='story'){ c.width=1080; c.height=1920; }
+  else { c.width=1080; c.height=1080; }
+  drawShareCard();
+}
+
+function openShare(did){
+  shareDreamId = did;
+  state.share = state.share || {org:'',contact:'',subtitle:''};
+  document.getElementById('shOrg').value = state.share.org || '';
+  document.getElementById('shContact').value = state.share.contact || '';
+  document.getElementById('shSubtitle').value = state.share.subtitle || '';
+  document.getElementById('shCaption').value = buildCaption();
+  document.getElementById('shareOverlay').classList.add('show');
+  setShareFormat('square');
+}
+function closeShare(){ document.getElementById('shareOverlay').classList.remove('show'); }
+
+function onShareInput(){
+  state.share = {
+    org: document.getElementById('shOrg').value,
+    contact: document.getElementById('shContact').value,
+    subtitle: document.getElementById('shSubtitle').value
+  };
+  save();
+  document.getElementById('shCaption').value = buildCaption();
+  drawShareCard();
+}
+
+function buildCaption(){
+  const d = currentDream(); if(!d) return '';
+  const pct = Math.min(100,(d.current/d.target)*100).toFixed(1);
+  const s = state.share || {};
+  let t = `🐾 Наша мрія: ${d.title}\n\n`;
+  t += `Уже зібрано ${fmt(d.current)} ${d.unit} з ${fmt(d.target)} ${d.unit} — це ${pct}% шляху!\n`;
+  if(s.subtitle) t += `${s.subtitle}\n`;
+  t += `\nКожен внесок наближає дім для тварин. Долучайся 💛`;
+  if(s.contact) t += `\n${s.contact}`;
+  return t;
+}
+
+/* --- малювання картинки --- */
+function roundRect(ctx,x,y,w,h,r){
+  r=Math.min(r,h/2,w/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function drawPaw(ctx,x,y,size,rotDeg){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate((rotDeg||0)*Math.PI/180);
+  const s=size/100;
+  ctx.beginPath(); ctx.ellipse(0,18*s,30*s,24*s,0,0,Math.PI*2); ctx.fill();
+  [[-26,-12,12],[-9,-26,12],[12,-24,12],[28,-8,12]].forEach(t=>{
+    ctx.beginPath(); ctx.ellipse(t[0]*s,t[1]*s,t[2]*s,(t[2]+2)*s,0,0,Math.PI*2); ctx.fill();
+  });
+  ctx.restore();
+}
+function wrapCentered(ctx,text,cx,startY,maxWidth,lineHeight,maxLines){
+  const words=String(text).split(/\s+/);
+  let lines=[], line='';
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxWidth && line){ lines.push(line); line=w; }
+    else line=test;
+  }
+  if(line) lines.push(line);
+  if(lines.length>maxLines){ lines=lines.slice(0,maxLines); lines[maxLines-1]=lines[maxLines-1].replace(/\s*\S*$/,'')+'…'; }
+  let y=startY;
+  lines.forEach((ln,i)=>{ y=startY+i*lineHeight; ctx.fillText(ln,cx,y); });
+  return y;
+}
+
+async function drawShareCard(){
+  const d = currentDream(); if(!d) return;
+  const c = document.getElementById('shareCanvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const story = (H > 1300);
+  const s = state.share || {};
+  const pct = Math.min(100,(d.current/d.target)*100);
+
+  try{
+    await Promise.all([
+      document.fonts.load('900 168px Fraunces'),
+      document.fonts.load('600 58px Fraunces'),
+      document.fonts.load('700 30px "Hanken Grotesk"'),
+      document.fonts.load('500 40px "Hanken Grotesk"'),
+      document.fonts.load('italic 500 36px "Hanken Grotesk"')
+    ]);
+  }catch(e){}
+
+  // фон
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#f5f8fd'); bg.addColorStop(1,'#dde7f4');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // лапки-фон
+  ctx.fillStyle='rgba(20,35,63,0.07)';
+  const paws = story
+    ? [[120,260,80,-15],[955,360,60,20],[150,1640,72,10],[940,1560,90,-12],[545,180,46,0],[905,1010,55,8],[140,990,50,-10]]
+    : [[120,180,70,-15],[945,250,55,20],[160,890,62,10],[930,870,82,-12],[545,135,40,0]];
+  paws.forEach(p=>drawPaw(ctx,p[0],p[1],p[2],p[3]));
+
+  // рамка
+  ctx.strokeStyle='rgba(20,35,63,0.30)'; ctx.lineWidth=4;
+  roundRect(ctx,40,40,W-80,H-80,28); ctx.stroke();
+
+  ctx.textAlign='center';
+  if(story) drawStoryContent(ctx,W,H,d,s,pct);
+  else      drawSquareContent(ctx,W,H,d,s,pct);
+}
+
+function drawProgressBar(ctx,barX,barY,barW,barH,pct){
+  const r=barH/2;
+  ctx.fillStyle='#d7deec'; roundRect(ctx,barX,barY,barW,barH,r); ctx.fill();
+  const fillW=Math.max(barH, barW*pct/100);
+  const fg=ctx.createLinearGradient(barX,0,barX+barW,0);
+  fg.addColorStop(0,'#f0857f'); fg.addColorStop(1,'#9c3a34');
+  ctx.fillStyle=fg; roundRect(ctx,barX,barY,fillW,barH,r); ctx.fill();
+}
+
+function drawSquareContent(ctx,W,H,d,s,pct){
+  ctx.fillStyle='#9c3a34'; ctx.font='700 30px "Hanken Grotesk"';
+  try{ ctx.letterSpacing='4px'; }catch(e){}
+  ctx.fillText((s.org||'Збір на велику мрію').toUpperCase(), W/2, 150);
+  try{ ctx.letterSpacing='0px'; }catch(e){}
+
+  ctx.font='48px "Hanken Grotesk"'; ctx.fillText('🐾', W/2, 222);
+
+  ctx.fillStyle='#14233f'; ctx.font='600 58px Fraunces';
+  const titleY = wrapCentered(ctx, d.title, W/2, 308, W-200, 66, 3);
+
+  ctx.fillStyle='#9c3a34'; ctx.font='900 162px Fraunces';
+  ctx.fillText(pct.toFixed(0)+'%', W/2, titleY+196);
+
+  drawProgressBar(ctx,140,titleY+250,W-280,44,pct);
+
+  ctx.fillStyle='#3f5170'; ctx.font='500 40px "Hanken Grotesk"';
+  let y = titleY+250+44+76;
+  ctx.fillText(`Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit}`, W/2, y);
+
+  if(s.subtitle){
+    ctx.fillStyle='#6b7d9c'; ctx.font='italic 500 36px "Hanken Grotesk"';
+    wrapCentered(ctx, s.subtitle, W/2, y+60, W-220, 46, 2);
+  }
+
+  ctx.fillStyle='#14233f'; ctx.font='600 50px Fraunces';
+  ctx.fillText('Долучайся до мрії 🐾', W/2, s.contact?928:958);
+  if(s.contact){
+    ctx.fillStyle='#9c3a34'; ctx.font='700 38px "Hanken Grotesk"';
+    ctx.fillText(s.contact, W/2, 990);
+  }
+}
+
+function drawStoryContent(ctx,W,H,d,s,pct){
+  ctx.fillStyle='#9c3a34'; ctx.font='700 34px "Hanken Grotesk"';
+  try{ ctx.letterSpacing='5px'; }catch(e){}
+  ctx.fillText((s.org||'Збір на велику мрію').toUpperCase(), W/2, 340);
+  try{ ctx.letterSpacing='0px'; }catch(e){}
+
+  ctx.font='72px "Hanken Grotesk"'; ctx.fillText('🐾', W/2, 460);
+
+  ctx.fillStyle='#14233f'; ctx.font='600 70px Fraunces';
+  const titleY = wrapCentered(ctx, d.title, W/2, 620, W-180, 82, 3);
+
+  ctx.fillStyle='#9c3a34'; ctx.font='900 234px Fraunces';
+  const pctY = Math.max(titleY+300, 1000);
+  ctx.fillText(pct.toFixed(0)+'%', W/2, pctY);
+
+  drawProgressBar(ctx,150,pctY+92,W-300,54,pct);
+
+  ctx.fillStyle='#3f5170'; ctx.font='500 48px "Hanken Grotesk"';
+  let y = pctY+92+54+98;
+  ctx.fillText(`Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit}`, W/2, y);
+
+  if(s.subtitle){
+    ctx.fillStyle='#6b7d9c'; ctx.font='italic 500 42px "Hanken Grotesk"';
+    wrapCentered(ctx, s.subtitle, W/2, y+74, W-200, 54, 2);
+  }
+
+  ctx.fillStyle='#14233f'; ctx.font='600 60px Fraunces';
+  ctx.fillText('Долучайся до мрії 🐾', W/2, s.contact?1560:1620);
+  if(s.contact){
+    ctx.fillStyle='#9c3a34'; ctx.font='700 46px "Hanken Grotesk"';
+    ctx.fillText(s.contact, W/2, 1640);
+  }
+}
+
+function downloadShare(){
+  const c=document.getElementById('shareCanvas');
+  c.toBlob(function(blob){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='mriya-'+(shareFormat==='story'?'storis':'post')+'.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    toast('⬇️ Картинку збережено!');
+  },'image/png');
+}
+
+async function copyCaption(){
+  const txt=document.getElementById('shCaption').value;
+  try{ await navigator.clipboard.writeText(txt); toast('📋 Текст скопійовано!'); }
+  catch(e){ const ta=document.getElementById('shCaption'); ta.focus(); ta.select(); toast('Виділив текст — натисни Ctrl+C'); }
+}
+
+async function aiCaption(){
+  const d=currentDream(); if(!d) return;
+  const s=state.share||{};
+  const btn=document.getElementById('aiCapBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span>';
+  const pct=Math.min(100,(d.current/d.target)*100).toFixed(0);
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,
+        messages:[{role:"user",content:
+          `Напиши теплий, щирий допис українською для соцмереж від благодійної організації, що рятує безпритульних тварин. `+
+          `Мрія: "${d.title}". Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit} (${pct}%). `+
+          (s.subtitle?`Важлива деталь: ${s.subtitle}. `:'')+
+          `Заклич людей долучитися фінансово та поширити допис. 3–5 речень, доречні емодзі, до 4 хештегів наприкінці. `+
+          (s.contact?`У кінці додай контакт: ${s.contact}. `:'')+
+          `Поверни лише текст допису, без лапок і пояснень.`
+        }]})
+    });
+    const data=await res.json();
+    const txt=(data.content||[]).map(i=>i.text||"").join("").trim();
+    if(txt) document.getElementById('shCaption').value=txt;
+    toast('✨ AI написав допис!');
+  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); }
+  finally{ btn.disabled=false; btn.innerHTML='✨ AI-допис'; }
+}
+
+/* ================= НАГОРОДИ ================= */
+function renderRewards(){
+  const el = document.getElementById('rewardList');
+  if(state.rewards.length===0){
+    el.innerHTML = '<div class="empty"><span class="big">🎁</span>Ще немає нагород.<br>Признач собі щось приємне за досягнення!</div>';
+    return;
+  }
+  el.innerHTML = state.rewards.map(r=>{
+    const can = state.profile.coins >= r.cost && !r.claimed;
+    return `<div class="reward ${r.claimed?'claimed':''}">
+      <div class="emoji">${esc(r.emoji||'🎁')}</div>
+      <div class="reward-info">
+        <b>${esc(r.name)}</b>
+        <div class="reward-cost">${r.claimed?'✅ Отримано':r.cost+' 🪙'}</div>
+      </div>
+      ${r.claimed?'':`<button class="btn btn-gold" ${can?'':'disabled'} onclick="claimReward('${r.id}')">Забрати</button>`}
+      <button class="mini" onclick="delReward('${r.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function addReward(){
+  const name = document.getElementById('rwName').value.trim();
+  const emoji = document.getElementById('rwEmoji').value.trim() || '🎁';
+  const cost = parseInt(document.getElementById('rwCost').value,10);
+  if(!name){ document.getElementById('rwName').focus(); return; }
+  if(!cost || cost<1){ document.getElementById('rwCost').focus(); return; }
+  state.rewards.push({id:uid(), name, emoji, cost, claimed:false});
+  document.getElementById('rwName').value='';
+  document.getElementById('rwEmoji').value='';
+  document.getElementById('rwCost').value='';
+  save(); renderRewards();
+}
+
+function claimReward(rid){
+  const r = state.rewards.find(x=>x.id===rid);
+  if(state.profile.coins < r.cost) return;
+  if(!confirm(`Обміняти ${r.cost} 🪙 на «${r.name}»?`)) return;
+  state.profile.coins -= r.cost;
+  r.claimed = true;
+  renderProfile();
+  renderRewards();
+  save();
+  toast('🎉 Нагороду розблоковано: '+r.name, true);
+}
+
+function delReward(rid){
+  state.rewards = state.rewards.filter(x=>x.id!==rid);
+  save(); renderRewards();
+}
+
+/* ================= РЕЗЕРВНА КОПІЯ ================= */
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'shlyah-heroya-backup-'+todayStr()+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  toast('💾 Резервну копію збережено!');
+}
+
+function importBackup(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data || typeof data!=='object' || Array.isArray(data)) throw new Error('bad');
+      if(!confirm('Відновити дані з копії? Поточний прогрес буде замінено.')){ input.value=''; return; }
+      state = data;
+      if(!state.profile) state.profile = {totalXp:0,coins:0,questsDone:0,stepsDone:0};
+      if(!state.quests)  state.quests = [];
+      if(!state.daily)   state.daily = {tasks:[],streak:0,lastAllDone:''};
+      if(!state.dreams)  state.dreams = [];
+      if(!state.rewards) state.rewards = [];
+      if(!state.share)   state.share = {org:'',contact:'',subtitle:''};
+      if(!state.me)      state.me = {strengths:'',interests:'',context:'',advice:''};
+      save();
+      renderProfile(); renderQuests(); renderDaily(); renderDreams(); renderRewards(); renderMe();
+      toast('✅ Дані відновлено!');
+    }catch(err){
+      toast('Не вдалося прочитати файл копії.');
+    }
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
+/* ================= УТИЛІТИ ================= */
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
+  ['quests','daily','dreams','rewards','me'].forEach(name=>{
+    document.getElementById('tab-'+name).classList.toggle('hidden', name!==t);
+  });
+}
+function fmt(n){ return Math.round(n).toLocaleString('uk-UA'); }
+function uid(){ return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3); }
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+let toastTimer;
+function toast(msg, level){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('level', !!level);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* ================= СТАРТ ================= */
+(async function init(){
+  // якщо запущено всередині Telegram — підготувати Mini App
+  if(typeof window!=='undefined' && window.Telegram && window.Telegram.WebApp){
+    try{ window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }catch(e){}
+  }
+  await load();
+  // сумісність зі старими збереженнями
+  if(!state.profile) state.profile = { totalXp:0, coins:0, questsDone:0, stepsDone:0 };
+  if(!state.quests)  state.quests = [];
+  if(!state.dreams)  state.dreams = [];
+  if(!state.rewards) state.rewards = [];
+  if(!state.share)   state.share = {org:'',contact:'',subtitle:''};
+  if(!state.me)      state.me = {strengths:'',interests:'',context:'',advice:''};
+  if(!state.daily)   state.daily = {tasks:[], streak:0, lastAllDone:''};
+  // якщо день пропущено — серія обнуляється
+  if(state.daily.lastAllDone && state.daily.lastAllDone!==todayStr() && state.daily.lastAllDone!==yesterdayStr()){
+    state.daily.streak = 0;
+  }
+  // закриття модалки кліком по фону
+  document.getElementById('shareOverlay').addEventListener('click',function(e){
+    if(e.target===this) closeShare();
+  });
+  // стартові приклади нагород для першого запуску
+  if(state.rewards.length===0 && state.quests.length===0 && state.dreams.length===0){
+    state.rewards = [
+      {id:uid(), name:'Замовити піцу 🍕', emoji:'🍕', cost:120, claimed:false},
+      {id:uid(), name:'Макдональдс', emoji:'🍔', cost:80, claimed:false},
+      {id:uid(), name:'Купити щось собі', emoji:'🛍️', cost:200, claimed:false},
+      {id:uid(), name:'Вечір серіалів без докорів сумління', emoji:'📺', cost:60, claimed:false}
+    ];
+  }
+  renderProfile();
+  renderQuests();
+  renderDaily();
+  renderDreams();
+  renderRewards();
+  renderMe();
+})();
+</script>
