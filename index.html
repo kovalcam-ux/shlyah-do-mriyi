@@ -185,14 +185,36 @@
   .dream-pct{font-size:12.5px;color:var(--muted);margin-top:7px;position:relative;z-index:1}
   .dream-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px;position:relative;z-index:1}
   .btn-sm{padding:9px 13px;font-size:13.5px}
-  .milestone{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:12px;background:#122038;border:1px solid #2a3c5e;margin-top:8px;font-size:14px;position:relative;z-index:1}
-  .milestone .box{width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);flex:none;display:grid;place-items:center;font-size:12px;color:transparent;cursor:pointer;transition:.15s}
-  .milestone.done{opacity:.55}
-  .milestone.done .m-txt{text-decoration:line-through;color:var(--muted)}
-  .milestone.done .box{background:var(--green);border-color:var(--green);color:#fff}
-  .m-txt{flex:1}
-  .m-quest{font-size:12px;background:#1a2942;border:1px solid var(--line);color:var(--cream);padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:.15s;font-family:inherit}
-  .m-quest:hover{border-color:var(--terra);color:var(--terra)}
+  /* ===== Дерево цілей ===== */
+  .tree{margin-top:14px}
+  .tree-empty{font-size:13px;color:var(--muted);background:#122038;border:1px dashed var(--line);border-radius:12px;padding:13px;line-height:1.5}
+  .node-kids{border-left:2px solid var(--line);margin-left:10px;padding-left:6px}
+  .node-row{display:flex;align-items:center;gap:7px;padding:8px 6px;border-radius:10px}
+  .node-row:hover{background:#0e1828}
+  .node-tw{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;width:18px;flex:none;font-family:inherit;padding:0}
+  .node-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);flex:none;display:grid;place-items:center;font-size:12px;color:#fff;cursor:pointer;transition:.15s}
+  .node-box.done{background:var(--green);border-color:var(--green)}
+  .node-txt{flex:1;font-size:14px;line-height:1.35}
+  .node-txt.done{text-decoration:line-through;color:var(--muted)}
+  .node-prog{font-size:11px;color:var(--muted);flex:none}
+  .node-act{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:3px 5px;border-radius:7px;flex:none;font-family:inherit}
+  .node-act:hover{color:var(--terra);background:#0b1322}
+  .node-pbar{height:4px;background:#0a1120;border-radius:6px;overflow:hidden;margin:0 6px 5px 26px}
+  .node-pfill{height:100%;background:linear-gradient(90deg,var(--gold),var(--terra));border-radius:6px;transition:width .4s}
+
+  /* ===== Персонаж ===== */
+  .avatar{cursor:pointer;transition:transform .15s}
+  .avatar:active{transform:scale(.92)}
+  .char-card{display:flex;align-items:center;gap:14px;padding:13px;border-radius:14px;background:var(--panel);border:1px solid var(--line);margin-bottom:10px;cursor:pointer;transition:.15s;position:relative}
+  .char-card:hover{border-color:var(--terra)}
+  .char-card.sel{border-color:var(--gold);background:#15233c}
+  .char-now{font-size:38px;width:52px;text-align:center;flex:none}
+  .char-info{flex:1;min-width:0}
+  .char-info b{font-size:15.5px;font-weight:600}
+  .char-line{margin-top:5px;font-size:18px;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+  .char-line .lock{opacity:.28;filter:grayscale(1)}
+  .char-line .arr{font-size:12px;color:var(--muted)}
+  .char-badge{position:absolute;top:10px;right:12px;color:var(--gold);font-weight:700}
 
   /* ===== Щоденні ===== */
   .streak-banner{background:linear-gradient(160deg,#1b2c49,#15233c);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;font-size:14.5px;color:var(--gold);text-align:center}
@@ -237,11 +259,11 @@
   <div class="hero" id="hero">
     <div class="hero-top">
       <div class="avatar-box">
-        <div class="avatar">🦊</div>
+        <div class="avatar" id="avatar" onclick="openCharPicker()" title="Натисни, щоб обрати героя">🦊</div>
         <div class="lvl-badge" id="lvlBadge">1</div>
       </div>
       <h1>Шлях до мрії
-        <span class="sub">Перетворюй цілі на пригоди</span>
+        <span class="sub" id="charStage">Початківець · натисни героя зліва</span>
       </h1>
     </div>
     <div class="xpbar-wrap">
@@ -416,6 +438,16 @@
   </div>
 </div>
 
+<!-- ===== МОДАЛКА: ВИБІР ПЕРСОНАЖА ===== -->
+<div class="overlay" id="charOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeCharPicker()">✕</button>
+    <h3>Обери свого героя</h3>
+    <p class="hint">Кожен герой росте й змінює вигляд із твоїм рівнем. Змінити можна будь-коли.</p>
+    <div id="charList"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -431,7 +463,8 @@ let state = {
   dreams:[],
   rewards:[],
   me:{ strengths:'', interests:'', context:'', advice:'' },
-  share:{ org:'', contact:'', subtitle:'' }
+  share:{ org:'', contact:'', subtitle:'' },
+  character:'fox'
 };
 /* ====== Універсальне сховище ======
    Працює в трьох середовищах:
@@ -503,10 +536,47 @@ function levelInfo(xp){
   return { level, into: xp-acc, need };
 }
 
+/* ================= ПЕРСОНАЖ ================= */
+const RANKS = ['Початківець','Помічник','Опікун','Захисник','Хранитель','Легенда'];
+const STAGE_LVL = [1,3,5,8,12,16];
+const CHARACTERS = [
+  {id:'fox',     name:'Лис-герой',        e:['🦊','🦊','🦊','🦊','🦊','🦊👑']},
+  {id:'beast',   name:'Звір-захисник',    e:['🐾','🐶','🐕','🐺','🦁','🐉']},
+  {id:'bird',    name:'Крилата вісниця',  e:['🥚','🐣','🐤','🐦','🦅','🦉']},
+  {id:'tree',    name:'Деревце мрії',     e:['🌱','🌿','🪴','🌳','🌲','🏞️']},
+  {id:'shelter', name:'Притулок',         e:['⛺','🏚️','🏠','🏡','🏘️','🏰']},
+  {id:'light',   name:'Світло добра',     e:['🕯️','✨','🌟','☀️','🌈','💫']}
+];
+function stageIndex(level){ let i=0; for(let k=0;k<STAGE_LVL.length;k++){ if(level>=STAGE_LVL[k]) i=k; } return i; }
+function currentChar(){ return CHARACTERS.find(c=>c.id===state.character) || CHARACTERS[0]; }
+
+function openCharPicker(){
+  const li=levelInfo(state.profile.totalXp), si=stageIndex(li.level);
+  document.getElementById('charList').innerHTML = CHARACTERS.map(c=>`
+    <div class="char-card ${c.id===state.character?'sel':''}" onclick="chooseChar('${c.id}')">
+      <div class="char-now">${c.e[si]}</div>
+      <div class="char-info">
+        <b>${c.name}</b>
+        <div class="char-line">${c.e.map((em,i)=>`<span class="${i<=si?'':'lock'}">${em}</span>`).join('<span class="arr">›</span>')}</div>
+      </div>
+      ${c.id===state.character?'<div class="char-badge">✓</div>':''}
+    </div>`).join('');
+  document.getElementById('charOverlay').classList.add('show');
+}
+function chooseChar(id){
+  state.character=id; save(); renderProfile();
+  document.getElementById('charOverlay').classList.remove('show');
+  toast('🎭 Героя обрано!');
+}
+function closeCharPicker(){ document.getElementById('charOverlay').classList.remove('show'); }
+
 /* ================= РЕНДЕР ПРОФІЛЮ ================= */
 function renderProfile(prevLevel){
   const p = state.profile;
   const li = levelInfo(p.totalXp);
+  const ch = currentChar(); const si = stageIndex(li.level);
+  document.getElementById('avatar').textContent = ch.e[si];
+  document.getElementById('charStage').textContent = RANKS[si] + ' · ' + ch.name;
   document.getElementById('lvlBadge').textContent = li.level;
   document.getElementById('lvlText').textContent = 'Рівень ' + li.level;
   document.getElementById('xpText').textContent = li.into + ' / ' + li.need + ' XP';
@@ -515,7 +585,8 @@ function renderProfile(prevLevel){
   document.getElementById('doneStat').textContent = p.questsDone;
   document.getElementById('stepStat').textContent = p.stepsDone;
   if(prevLevel!==undefined && li.level>prevLevel){
-    toast('🎉 Новий рівень ' + li.level + '! Так тримати!', true);
+    const ns = stageIndex(li.level);
+    toast('🎉 Рівень ' + li.level + '! ' + (ns>stageIndex(prevLevel)?('Герой росте — тепер ти '+RANKS[ns]+'!'):'Так тримати!'), true);
     document.getElementById('hero').classList.add('pop');
     setTimeout(()=>document.getElementById('hero').classList.remove('pop'),400);
   }
@@ -856,8 +927,49 @@ function delDaily(id){
   save(); renderDaily();
 }
 
-/* ================= МРІЯ ================= */
-const MILESTONE_REWARD = 40;
+/* ================= МРІЯ: ДЕРЕВО ЦІЛЕЙ ================= */
+const NODE_REWARD = 15;
+
+function migrateDreams(){
+  (state.dreams||[]).forEach(d=>{
+    if(!d.nodes){
+      d.nodes = (d.milestones||[]).map(m=>({id:(m&&m.id)||uid(), text:(m&&m.text)||'', done:!!(m&&m.done), children:[], open:true}));
+    }
+    delete d.milestones;
+  });
+}
+function leafStats(node){
+  if(!node.children || node.children.length===0) return {leaves:1, done: node.done?1:0};
+  let leaves=0, done=0;
+  node.children.forEach(c=>{ const s=leafStats(c); leaves+=s.leaves; done+=s.done; });
+  return {leaves, done};
+}
+function nodesStats(nodes){
+  let leaves=0, done=0;
+  (nodes||[]).forEach(n=>{ const s=leafStats(n); leaves+=s.leaves; done+=s.done; });
+  return {leaves, done};
+}
+function findNode(nodes, id){
+  for(const n of (nodes||[])){
+    if(n.id===id) return n;
+    if(n.children){ const f=findNode(n.children,id); if(f) return f; }
+  }
+  return null;
+}
+function removeNode(nodes, id){
+  const i=(nodes||[]).findIndex(n=>n.id===id);
+  if(i>=0){ nodes.splice(i,1); return true; }
+  for(const n of (nodes||[])){ if(n.children && removeNode(n.children,id)) return true; }
+  return false;
+}
+function nodePath(nodes, id, trail){
+  for(const n of (nodes||[])){
+    const t=[...trail, n.text];
+    if(n.id===id) return t;
+    if(n.children){ const r=nodePath(n.children,id,t); if(r) return r; }
+  }
+  return null;
+}
 
 function renderDreams(){
   const el = document.getElementById('dreamList');
@@ -867,26 +979,88 @@ function renderDreams(){
   }
   el.innerHTML = state.dreams.map(d=>{
     const pct = Math.min(100,(d.current/d.target)*100);
-    const mdone = d.milestones.filter(m=>m.done).length;
+    const st = nodesStats(d.nodes);
+    const taskPct = st.leaves ? (st.done/st.leaves*100) : 0;
+    const treeHtml = (d.nodes&&d.nodes.length)
+      ? d.nodes.map(n=>renderNode(d.id,n)).join('')
+      : '<div class="tree-empty">Натисни «✨ Розбити», щоб AI поділив мрію на під-цілі — а кожну з них можна розбивати ще глибше, аж до маленьких кроків.</div>';
     return `<div class="dream-card">
       <div class="dream-title">${esc(d.title)}</div>
       <div class="dream-amount">${fmt(d.current)} <small>/ ${fmt(d.target)} ${esc(d.unit)}</small></div>
       <div class="dream-bar"><div class="dream-bar-fill" style="width:${pct}%"></div></div>
-      <div class="dream-pct">${pct.toFixed(1)}% досягнуто${d.milestones.length?` · етапів: ${mdone}/${d.milestones.length}`:''}</div>
+      <div class="dream-pct">💰 ${pct.toFixed(1)}% зібрано${st.leaves?` · 🎯 кроків ${st.done}/${st.leaves} (${taskPct.toFixed(0)}%)`:''}</div>
       <div class="dream-actions">
         <button class="btn btn-gold btn-sm" onclick="addContribution('${d.id}')">＋ Внесок</button>
-        <button class="btn btn-primary btn-sm" id="dreamGen-${d.id}" onclick="breakDream('${d.id}')">✨ Розбити на етапи</button>
-        <button class="btn btn-ghost btn-sm" onclick="openShare('${d.id}')">📤 Поділитися</button>
+        <button class="btn btn-primary btn-sm" id="dreamGen-${d.id}" onclick="breakDream('${d.id}')">✨ Розбити</button>
+        <button class="btn btn-ghost btn-sm" onclick="addChildPrompt('${d.id}',null)">＋ Підціль</button>
+        <button class="btn btn-ghost btn-sm" onclick="openShare('${d.id}')">📤</button>
         <button class="btn btn-ghost btn-sm" onclick="delDream('${d.id}')">✕</button>
       </div>
-      ${d.milestones.map(m=>`
-        <div class="milestone ${m.done?'done':''}">
-          <div class="box" onclick="toggleMilestone('${d.id}','${m.id}')">✓</div>
-          <div class="m-txt">${esc(m.text)}</div>
-          <button class="m-quest" onclick="milestoneToQuest('${d.id}','${m.id}')">🎯 зробити ціллю</button>
-        </div>`).join('')}
+      <div class="tree">${treeHtml}</div>
     </div>`;
   }).join('');
+}
+
+function renderNode(did, node){
+  const hasKids = node.children && node.children.length>0;
+  const open = node.open !== false;
+  const s = leafStats(node);
+  const prog = hasKids ? Math.round(s.done/s.leaves*100) : 0;
+  let row = '<div class="node"><div class="node-row">';
+  if(hasKids) row += `<button class="node-tw" onclick="toggleOpen('${did}','${node.id}')">${open?'▾':'▸'}</button>`;
+  else row += `<div class="node-box ${node.done?'done':''}" onclick="toggleLeaf('${did}','${node.id}')">${node.done?'✓':''}</div>`;
+  row += `<div class="node-txt ${(!hasKids&&node.done)?'done':''}">${esc(node.text)}</div>`;
+  if(hasKids) row += `<span class="node-prog">${s.done}/${s.leaves}</span>`;
+  row += `<button class="node-act" id="nodeGen-${node.id}" onclick="decomposeNode('${did}','${node.id}')" title="Розбити глибше">✨</button>`;
+  row += `<button class="node-act" onclick="addChildPrompt('${did}','${node.id}')" title="Додати підпункт">＋</button>`;
+  row += `<button class="node-act" onclick="delNode('${did}','${node.id}')" title="Видалити">✕</button>`;
+  row += '</div>';
+  if(hasKids){
+    row += `<div class="node-pbar"><div class="node-pfill" style="width:${prog}%"></div></div>`;
+    if(open) row += `<div class="node-kids">${node.children.map(c=>renderNode(did,c)).join('')}</div>`;
+  }
+  row += '</div>';
+  return row;
+}
+
+function toggleOpen(did,nid){
+  const d=state.dreams.find(x=>x.id===did); const n=findNode(d.nodes,nid);
+  n.open = !(n.open!==false);
+  save(); renderDreams();
+}
+
+function addChildPrompt(did, parentId){
+  const t = prompt(parentId ? 'Текст підпункту:' : 'Текст під-цілі:');
+  if(!t || !t.trim()) return;
+  const d=state.dreams.find(x=>x.id===did);
+  const node={id:uid(), text:t.trim(), done:false, children:[], open:true};
+  if(parentId){ const p=findNode(d.nodes,parentId); p.children=p.children||[]; p.children.push(node); p.open=true; p.done=false; }
+  else { d.nodes=d.nodes||[]; d.nodes.push(node); }
+  save(); renderDreams();
+}
+
+function toggleLeaf(did,nid){
+  const d=state.dreams.find(x=>x.id===did); const n=findNode(d.nodes,nid);
+  const prevLevel=levelInfo(state.profile.totalXp).level;
+  n.done=!n.done;
+  if(n.done){
+    state.profile.coins+=NODE_REWARD; state.profile.totalXp+=NODE_REWARD; state.profile.stepsDone++;
+    const st=nodesStats(d.nodes);
+    if(st.leaves && st.done===st.leaves){ state.profile.questsDone++; toast('🏆 Усі кроки мрії пройдено!', true); }
+    else toast('+'+NODE_REWARD+' 🪙  ⚡');
+  } else {
+    state.profile.coins=Math.max(0,state.profile.coins-NODE_REWARD);
+    state.profile.totalXp=Math.max(0,state.profile.totalXp-NODE_REWARD);
+    state.profile.stepsDone=Math.max(0,state.profile.stepsDone-1);
+  }
+  renderProfile(prevLevel); renderDreams(); save();
+}
+
+function delNode(did,nid){
+  if(!confirm('Видалити цей пункт і все під ним?')) return;
+  const d=state.dreams.find(x=>x.id===did);
+  removeNode(d.nodes,nid);
+  save(); renderDreams();
 }
 
 function addDream(){
@@ -895,7 +1069,7 @@ function addDream(){
   const unit = document.getElementById('drUnit').value.trim() || '$';
   if(!title){ document.getElementById('drTitle').focus(); return; }
   if(!target || target<=0){ document.getElementById('drTarget').focus(); return; }
-  state.dreams.unshift({id:uid(), title, target, current:0, unit, milestones:[]});
+  state.dreams.unshift({id:uid(), title, target, current:0, unit, nodes:[]});
   document.getElementById('drTitle').value='';
   document.getElementById('drTarget').value='';
   save(); renderDreams();
@@ -913,70 +1087,52 @@ function addContribution(did){
   if(amt>0) toast('💪 +'+fmt(amt)+' '+d.unit+' до мрії!');
 }
 
-async function genPhases(title, target, unit){
+async function genChildren(dreamTitle, path, nodeText, isRoot){
+  const ctx = isRoot
+    ? `Велика довгострокова мрія: "${dreamTitle}".`
+    : `У межах великої мрії "${dreamTitle}" є така ціль (шлях: ${path}): "${nodeText}".`;
+  const ask = isRoot
+    ? `Розбий цю мрію на 4–6 великих під-цілей українською.`
+    : `Розбий цю ціль на 3–5 менших, конкретніших під-кроків українською. Якщо ціль уже зовсім дрібна — зроби 2–4 простих дієвих кроки.`;
   const res = await fetch("https://shlyah-do-mriyi-ai.koval93cam.workers.dev",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      model:"claude-haiku-4-5-20251001",
-      max_tokens:1000,
-      messages:[{role:"user",content:
-        `Я маю масштабну довгострокову мрію: "${title}" (фінансова ціль: ${target} ${unit}). `+
-        `Розбий її на 5–7 великих стратегічних етапів українською — логічна послідовність від старту до повної реалізації. `+
-        profileHint()+
-        `Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown.`
-      }]
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:1000,
+      messages:[{role:"user",content: ctx+' '+ask+' '+profileHint()+
+        'Відповідай ВИКЛЮЧНО валідним JSON-масивом рядків, без пояснень, без markdown.' }]
     })
   });
-  const data = await res.json();
-  let txt = (data.content||[]).map(i=>i.text||"").join("").trim().replace(/```json|```/g,"").trim();
-  const arr = JSON.parse(txt);
-  if(!Array.isArray(arr) || arr.length===0) throw new Error("empty");
+  const data=await res.json();
+  let txt=(data.content||[]).map(i=>i.text||"").join("").trim().replace(/```json|```/g,"").trim();
+  const arr=JSON.parse(txt);
+  if(!Array.isArray(arr)||arr.length===0) throw new Error('empty');
   return arr;
 }
 
 async function breakDream(did){
-  const d = state.dreams.find(x=>x.id===did);
-  const btn = document.getElementById('dreamGen-'+did);
-  if(d.milestones.length && !confirm('Етапи вже є. Згенерувати наново (замінить поточні)?')) return;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin">⏳</span> думаю...';
+  const d=state.dreams.find(x=>x.id===did);
+  const btn=document.getElementById('dreamGen-'+did);
+  if((d.nodes||[]).length && !confirm('Під-цілі вже є. Згенерувати наново (замінить верхній рівень)?')) return;
+  btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span>';
   try{
-    const phases = await genPhases(d.title, d.target, d.unit);
-    d.milestones = phases.map(t=>({id:uid(), text:t, done:false}));
-    save(); renderDreams();
-    toast('🗺️ Мрію розбито на етапи!');
-  }catch(e){
-    toast('Не вдалося згенерувати. Спробуй ще раз.');
-    btn.disabled = false;
-    btn.innerHTML = '✨ Розбити на етапи';
-  }
+    const arr=await genChildren(d.title,'',d.title,true);
+    d.nodes=arr.map(t=>({id:uid(),text:t,done:false,children:[],open:true}));
+    save(); renderDreams(); toast('🗺️ Мрію розбито на під-цілі!');
+  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); btn.disabled=false; btn.innerHTML='✨ Розбити'; }
 }
 
-function toggleMilestone(did, mid){
-  const d = state.dreams.find(x=>x.id===did);
-  const m = d.milestones.find(x=>x.id===mid);
-  const prevLevel = levelInfo(state.profile.totalXp).level;
-  m.done = !m.done;
-  if(m.done){
-    state.profile.coins += MILESTONE_REWARD;
-    state.profile.totalXp += MILESTONE_REWARD;
-    toast('🌟 Етап мрії пройдено! +'+MILESTONE_REWARD+' 🪙');
-  }else{
-    state.profile.coins = Math.max(0, state.profile.coins - MILESTONE_REWARD);
-    state.profile.totalXp = Math.max(0, state.profile.totalXp - MILESTONE_REWARD);
-  }
-  renderProfile(prevLevel); renderDreams(); save();
-}
-
-async function milestoneToQuest(did, mid){
-  const d = state.dreams.find(x=>x.id===did);
-  const m = d.milestones.find(x=>x.id===mid);
-  switchTab('quests');
-  toast('🎯 Створюю ціль з етапу...');
-  let steps = [];
-  try{ steps = await genSteps(m.text); }catch(e){ steps = []; }
-  createQuest(m.text, steps);
+async function decomposeNode(did,nid){
+  const d=state.dreams.find(x=>x.id===did);
+  const n=findNode(d.nodes,nid);
+  if(n.children && n.children.length && !confirm('Підпункти вже є. Згенерувати наново?')) return;
+  const btn=document.getElementById('nodeGen-'+nid);
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳'; }
+  try{
+    const path=(nodePath(d.nodes,nid,[])||[]).join(' → ');
+    const arr=await genChildren(d.title, path, n.text, false);
+    n.children=arr.map(t=>({id:uid(),text:t,done:false,children:[],open:true}));
+    n.done=false; n.open=true;
+    save(); renderDreams(); toast('✨ Розбито глибше!');
+  }catch(e){ toast('Не вдалося. Спробуй ще раз.'); if(btn){ btn.disabled=false; btn.innerHTML='✨'; } }
 }
 
 function delDream(did){
@@ -1312,6 +1468,8 @@ function importBackup(input){
       if(!state.rewards) state.rewards = [];
       if(!state.share)   state.share = {org:'',contact:'',subtitle:''};
       if(!state.me)      state.me = {strengths:'',interests:'',context:'',advice:''};
+      if(!state.character) state.character = 'fox';
+      migrateDreams();
       save();
       renderProfile(); renderQuests(); renderDaily(); renderDreams(); renderRewards(); renderMe();
       toast('✅ Дані відновлено!');
@@ -1357,14 +1515,19 @@ function toast(msg, level){
   if(!state.rewards) state.rewards = [];
   if(!state.share)   state.share = {org:'',contact:'',subtitle:''};
   if(!state.me)      state.me = {strengths:'',interests:'',context:'',advice:''};
+  if(!state.character) state.character = 'fox';
   if(!state.daily)   state.daily = {tasks:[], streak:0, lastAllDone:''};
+  migrateDreams();
   // якщо день пропущено — серія обнуляється
   if(state.daily.lastAllDone && state.daily.lastAllDone!==todayStr() && state.daily.lastAllDone!==yesterdayStr()){
     state.daily.streak = 0;
   }
-  // закриття модалки кліком по фону
+  // закриття модалок кліком по фону
   document.getElementById('shareOverlay').addEventListener('click',function(e){
     if(e.target===this) closeShare();
+  });
+  document.getElementById('charOverlay').addEventListener('click',function(e){
+    if(e.target===this) closeCharPicker();
   });
   // стартові приклади нагород для першого запуску
   if(state.rewards.length===0 && state.quests.length===0 && state.dreams.length===0){
