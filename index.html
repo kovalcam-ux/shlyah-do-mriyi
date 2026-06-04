@@ -379,6 +379,27 @@
 
   <!-- ===== ТАБ: НАГОРОДИ ===== -->
   <div id="tab-rewards" class="hidden">
+    <div class="new-zone" style="border-style:solid">
+      <h3 style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0" onclick="toggleCoinInfo()"><span>💡 Як працює курс монет?</span><span id="coinInfoArrow" style="color:var(--muted);font-size:14px">▸</span></h3>
+      <div id="coinInfoBody" class="hidden" style="margin-top:13px;font-size:13.5px;line-height:1.6;color:var(--cream)">
+        <p style="margin-bottom:8px">Монети — це твої зусилля у вигляді «валюти». Приблизно за дії:</p>
+        <ul style="margin:0 0 11px 18px;padding:0">
+          <li>⚡ крок цілі — <b>+20</b></li>
+          <li>🔁 щоденна справа — <b>+10</b> (і <b>+30</b> бонус, коли всі за день зроблено)</li>
+          <li>🏆 повністю виконана ціль — <b>+60</b> бонус</li>
+          <li>🌳 крок мрії — <b>+15</b></li>
+        </ul>
+        <p style="margin-bottom:11px">За активний день зазвичай виходить <b>≈ 100–200 монет</b>.</p>
+        <p style="margin-bottom:11px"><b>Головний принцип:</b> ціну нагороди міряй не в гривнях, а в <b>ДНЯХ зусиль</b> — тоді вона відчувається чесно заробленою.</p>
+        <p style="margin-bottom:6px"><b>Орієнтири:</b></p>
+        <ul style="margin:0 0 11px 18px;padding:0">
+          <li>🍕 Піца / фастфуд — <b>~300–400</b> (≈ 3–4 дні)</li>
+          <li>🛍️ Щось купити собі, кіно — <b>~800–1200</b> (≈ тиждень-півтора)</li>
+          <li>🎉 Велика приємність — <b>~3000–5000</b> (≈ місяць)</li>
+        </ul>
+        <p style="margin:0"><b>Порада:</b> отримуєш нагороди надто легко — підвищ ціни; надто рідко — знизь.</p>
+      </div>
+    </div>
     <div class="new-zone">
       <h3>Нова нагорода</h3>
       <p>Признач собі винагороду за виконані цілі — заробляй монети й обмінюй їх.</p>
@@ -1526,6 +1547,12 @@ async function aiCaption(){
 }
 
 /* ================= НАГОРОДИ ================= */
+function toggleCoinInfo(){
+  const b=document.getElementById('coinInfoBody');
+  const hidden=b.classList.toggle('hidden');
+  document.getElementById('coinInfoArrow').textContent = hidden ? '▸' : '▾';
+}
+
 function renderRewards(){
   const el = document.getElementById('rewardList');
   if(state.rewards.length===0){
