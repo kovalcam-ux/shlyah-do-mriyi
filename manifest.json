@@ -1,0 +1,26 @@
+{
+  "name": "Шлях до мрії — трекер цілей",
+  "short_name": "Шлях до мрії",
+  "description": "Гейміфікований трекер цілей благодійного притулку для тварин: цілі, щоденні справи, велика мрія-збір, нагороди.",
+  "lang": "uk",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1322",
+  "theme_color": "#0b1322",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

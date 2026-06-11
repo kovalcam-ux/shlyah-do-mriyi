@@ -1,7 +1,10 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
 <!-- Quest Tracker — гейміфікований трекер цілей -->
 <!-- Telegram Mini App: SDK підключено (потрібно для роботи всередині Telegram) -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- встановлення як застосунок на головний екран телефона -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -9,6 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Шлях до мрії">
 <meta name="theme-color" content="#0b1322">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
@@ -260,6 +264,8 @@
   .close-x{float:right;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;margin:-6px -4px 0 0;line-height:1}
   .close-x:hover{color:var(--terra)}
 </style>
+</head>
+<body>
 
 <div class="wrap">
 
@@ -1310,15 +1316,15 @@ function addDaily(){
 }
 
 function toggleDaily(id){
-  const t=state.daily.tasks.find(x=>x.id===id);
+  const task=state.daily.tasks.find(x=>x.id===id);
   const today=todayStr();
   const prevLevel=levelInfo(state.profile.totalXp).level;
-  if(t.doneDate===today){
-    t.doneDate='';
+  if(task.doneDate===today){
+    task.doneDate='';
     state.profile.coins=Math.max(0,state.profile.coins-DAILY_COIN);
     state.profile.totalXp=Math.max(0,state.profile.totalXp-DAILY_COIN);
   }else{
-    t.doneDate=today;
+    task.doneDate=today;
     state.profile.coins+=DAILY_COIN;
     state.profile.totalXp+=DAILY_COIN;
     toast(t('coinPlus', DAILY_COIN));
@@ -2014,3 +2020,12 @@ function toast(msg, level){
   renderMe();
 })();
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
