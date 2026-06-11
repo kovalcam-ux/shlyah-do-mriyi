@@ -367,7 +367,7 @@
     <div class="new-zone">
       <h3 data-i18n="dreamH">Велика мрія</h3>
       <p data-i18n="dreamP">Признач масштабну мету — навіть без кроків. Відстежуй прогрес у сумі, а коли будеш готовий — розбий її на етапи.</p>
-      <input id="drTitle" data-i18n-ph="drTitlePh" placeholder="Напр.: Комплекс для порятунку тварин" style="margin-bottom:8px">
+      <input id="drTitle" data-i18n-ph="drTitlePh" placeholder="Напр.: Накопичити на власне житло" style="margin-bottom:8px">
       <div class="row">
         <input id="drTarget" type="number" min="1" data-i18n-ph="drTargetPh" placeholder="Сума цілі (18000000)" style="flex:1;min-width:150px">
         <input id="drUnit" data-i18n-ph="drUnitPh" placeholder="Валюта" value="$" style="flex:0 0 110px">
@@ -382,7 +382,7 @@
     <div class="new-zone">
       <h3 data-i18n="questH">Нова ціль</h3>
       <p data-i18n="questP">Опиши, чого хочеш досягти — Claude розіб'є це на чіткі кроки.</p>
-      <textarea id="goalInput" rows="2" data-i18n-ph="goalInputPh" placeholder="Напр.: Знайти 5 нових волонтерів для притулку"></textarea>
+      <textarea id="goalInput" rows="2" data-i18n-ph="goalInputPh" placeholder="Напр.: Вивчити англійську до впевненого рівня"></textarea>
       <div class="row" style="margin-top:10px">
         <button class="btn btn-primary" id="genBtn" onclick="generateQuest()" data-i18n="genBtn">✨ Створити кроки з AI</button>
         <button class="btn btn-ghost" onclick="generateQuest(true)" data-i18n="manualBtn">✍️ Додати вручну</button>
@@ -453,14 +453,14 @@
       <canvas id="shareCanvas" width="1080" height="1080"></canvas>
     </div>
 
-    <label data-i18n="shOrgLabel">Назва фонду / підпис зверху</label>
-    <input class="full" id="shOrg" data-i18n-ph="shOrgPh" placeholder="Напр.: Прихисток для тварин «Лапа»" oninput="onShareInput()">
+    <label data-i18n="shOrgLabel">Назва / підпис зверху</label>
+    <input class="full" id="shOrg" data-i18n-ph="shOrgPh" placeholder="Напр.: Мій шлях до мрії" oninput="onShareInput()">
 
     <label data-i18n="shSubtitleLabel">Додатковий рядок (необов'язково)</label>
     <input class="full" id="shSubtitle" data-i18n-ph="shSubtitlePh" placeholder="Напр.: 70 собак і 80 котів чекають на дім" oninput="onShareInput()">
 
     <label data-i18n="shContactLabel">Контакт для допомоги</label>
-    <input class="full" id="shContact" data-i18n-ph="shContactPh" placeholder="Напр.: @lapa_shelter або картка 0000 0000 0000 0000" oninput="onShareInput()">
+    <input class="full" id="shContact" data-i18n-ph="shContactPh" placeholder="Напр.: @твій_нік або картка 0000 0000 0000 0000" oninput="onShareInput()">
 
     <div class="row">
       <button class="btn btn-primary full" onclick="downloadShare()" data-i18n="downloadBtn">⬇️ Завантажити картинку</button>
@@ -614,7 +614,7 @@ const I18N = {
     // Мрія
     dreamH:'Велика мрія',
     dreamP:'Признач масштабну мету — навіть без кроків. Відстежуй прогрес у сумі, а коли будеш готовий — розбий її на етапи.',
-    drTitlePh:'Напр.: Комплекс для порятунку тварин',
+    drTitlePh:'Напр.: Накопичити на власне житло',
     drTargetPh:'Сума цілі (18000000)', drUnitPh:'Валюта',
     addDreamBtn:'＋ Додати мрію',
     emptyDreams:'<span class="big">🌟</span>Ще немає великої мрії.<br>Признач масштабну мету, до якої прагнеш.',
@@ -624,7 +624,7 @@ const I18N = {
     // Цілі
     questH:'Нова ціль',
     questP:"Опиши, чого хочеш досягти — Claude розіб'є це на чіткі кроки.",
-    goalInputPh:'Напр.: Знайти 5 нових волонтерів для притулку',
+    goalInputPh:'Напр.: Вивчити англійську до впевненого рівня',
     genBtn:'✨ Створити кроки з AI', genBtnBusy:'<span class="spin">⏳</span> Claude думає...',
     manualBtn:'✍️ Додати вручну',
     emptyQuests:'<span class="big">🗺️</span>Поки що немає цілей.<br>Створи першу — і вирушай у пригоду!',
@@ -651,9 +651,9 @@ const I18N = {
     shareH:'Поділитися прогресом',
     shareHint:'Готова картинка для Instagram / Facebook. Обери формат, заповни підписи — і збережи або скопіюй текст.',
     fmtPost:'⬛ Пост 1:1', fmtStory:'📱 Сторіз 9:16',
-    shOrgLabel:'Назва фонду / підпис зверху', shOrgPh:'Напр.: Прихисток для тварин «Лапа»',
+    shOrgLabel:'Назва / підпис зверху', shOrgPh:'Напр.: Мій шлях до мрії',
     shSubtitleLabel:"Додатковий рядок (необов'язково)", shSubtitlePh:'Напр.: 70 собак і 80 котів чекають на дім',
-    shContactLabel:'Контакт для допомоги', shContactPh:'Напр.: @lapa_shelter або картка 0000 0000 0000 0000',
+    shContactLabel:'Контакт для допомоги', shContactPh:'Напр.: @твій_нік або картка 0000 0000 0000 0000',
     downloadBtn:'⬇️ Завантажити картинку',
     captionLabel:'Текст допису', captionPh:"Тут з'явиться готовий текст...",
     copyBtn:'📋 Скопіювати текст', aiCapBtn:'✨ AI-допис',
@@ -706,7 +706,7 @@ const I18N = {
     // Канвас банера / допис
     capDream:(title)=>`🐾 Наша мрія: ${title}`,
     capRaised:(cur,unit,target,pct)=>`Уже зібрано ${cur} ${unit} з ${target} ${unit} — це ${pct}% шляху!`,
-    capJoin:'Кожен внесок наближає дім для тварин. Долучайся 💛',
+    capJoin:'Кожен крок наближає мрію. Долучайся 💛',
     cardOrgDefault:'Збір на велику мрію',
     cardRaised:(cur,target,unit)=>`Зібрано ${cur} з ${target} ${unit}`,
     cardJoin:'Долучайся до мрії 🐾'
@@ -750,7 +750,7 @@ const I18N = {
     streakBanner:(streak,done,total)=>`🔥 Streak: <b>${streak}</b> ${streak===1?'day':'days'} in a row · today ${done}/${total}`,
     dreamH:'Big dream',
     dreamP:"Set an ambitious goal — even without steps. Track progress by amount, and when you're ready, break it into stages.",
-    drTitlePh:'e.g., An animal rescue centre',
+    drTitlePh:'e.g., Save up for my own home',
     drTargetPh:'Target amount (18000000)', drUnitPh:'Currency',
     addDreamBtn:'＋ Add dream',
     emptyDreams:'<span class="big">🌟</span>No big dream yet.<br>Set an ambitious goal to strive for.',
@@ -759,7 +759,7 @@ const I18N = {
     dreamPct:(pctStr,leaves,doneN,taskPctStr)=>`💰 ${pctStr}% raised`+(leaves?` · 🎯 steps ${doneN}/${leaves} (${taskPctStr}%)`:''),
     questH:'New goal',
     questP:'Describe what you want to achieve — Claude will break it into clear steps.',
-    goalInputPh:'e.g., Find 5 new volunteers for the shelter',
+    goalInputPh:'e.g., Learn English to a confident level',
     genBtn:'✨ Generate steps with AI', genBtnBusy:'<span class="spin">⏳</span> Claude is thinking...',
     manualBtn:'✍️ Add manually',
     emptyQuests:'<span class="big">🗺️</span>No goals yet.<br>Create your first one and set off on an adventure!',
@@ -782,9 +782,9 @@ const I18N = {
     shareH:'Share your progress',
     shareHint:'A ready image for Instagram / Facebook. Pick a format, fill in the captions — then save it or copy the text.',
     fmtPost:'⬛ Post 1:1', fmtStory:'📱 Story 9:16',
-    shOrgLabel:'Fund name / top caption', shOrgPh:"e.g., «Lapa» Animal Shelter",
+    shOrgLabel:'Name / top caption', shOrgPh:"e.g., My road to the dream",
     shSubtitleLabel:'Extra line (optional)', shSubtitlePh:'e.g., 70 dogs and 80 cats are waiting for a home',
-    shContactLabel:'Contact for help', shContactPh:'e.g., @lapa_shelter or card 0000 0000 0000 0000',
+    shContactLabel:'Contact for help', shContactPh:'e.g., @your_handle or card 0000 0000 0000 0000',
     downloadBtn:'⬇️ Download image',
     captionLabel:'Caption text', captionPh:'The ready text will appear here...',
     copyBtn:'📋 Copy text', aiCapBtn:'✨ AI caption',
@@ -834,7 +834,7 @@ const I18N = {
     sampleRewards:[{name:'Order pizza 🍕',emoji:'🍕',cost:120},{name:"McDonald's",emoji:'🍔',cost:80},{name:'Buy yourself something',emoji:'🛍️',cost:200},{name:'A guilt-free evening of series',emoji:'📺',cost:60}],
     capDream:(title)=>`🐾 Our dream: ${title}`,
     capRaised:(cur,unit,target,pct)=>`We've raised ${cur} ${unit} of ${target} ${unit} — that's ${pct}% of the way!`,
-    capJoin:'Every contribution brings animals closer to a home. Join in 💛',
+    capJoin:'Every step brings the dream closer. Join in 💛',
     cardOrgDefault:'Raising funds for a big dream',
     cardRaised:(cur,target,unit)=>`Raised ${cur} of ${target} ${unit}`,
     cardJoin:'Join the dream 🐾'
@@ -1842,10 +1842,10 @@ async function aiCaption(){
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:600,
         messages:[{role:"user",content:
-          `Напиши теплий, щирий допис ${langWord()} для соцмереж від благодійної організації, що рятує безпритульних тварин. `+
-          `Мрія: "${d.title}". Зібрано ${fmt(d.current)} з ${fmt(d.target)} ${d.unit} (${pct}%). `+
+          `Напиши теплий, щирий допис ${langWord()} для соцмереж про прогрес до мрії. `+
+          `Мрія: "${d.title}". Прогрес: ${fmt(d.current)} з ${fmt(d.target)} ${d.unit} (${pct}%). `+
           (s.subtitle?`Важлива деталь: ${s.subtitle}. `:'')+
-          `Заклич людей долучитися фінансово та поширити допис. 3–5 речень, доречні емодзі, до 4 хештегів наприкінці. `+
+          `Врахуй природу мрії: якщо вона про збір коштів чи спільну справу — щиро заклич людей підтримати та поширити допис; якщо це особиста мета — поділись надихаючим прогресом і запроси вболівати за тебе. 3–5 речень, доречні емодзі, до 4 хештегів наприкінці. `+
           (s.contact?`У кінці додай контакт: ${s.contact}. `:'')+
           `Поверни лише текст допису, без лапок і пояснень.`
         }]})
