@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a2e5a">
+<title>Загін Носик — гра притулку</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥊</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Повернутися на головний сайт притулку -->
+  <a id="back-link" href="../index.html">← На сайт притулку</a>
+
+  <!-- Сюди Phaser монтує канвас -->
+  <div id="game-container"></div>
+
+  <!-- Сенсорне керування (показується грою лише на телефоні під час бою) -->
+  <div id="touch-controls">
+    <div id="joy-base">
+      <div id="joy-knob"></div>
+    </div>
+    <div id="action-buttons">
+      <div id="btn-punch" class="act-btn">УДАР</div>
+      <div id="btn-kick" class="act-btn">НОГА</div>
+      <div id="btn-block" class="act-btn">БЛОК</div>
+    </div>
+  </div>
+
+  <!-- Підказка: поверни телефон горизонтально -->
+  <div id="rotate">
+    <div class="icon">📱</div>
+    <h2>Поверни телефон</h2>
+    <p>Гра працює в горизонтальному (ландшафтному) режимі.</p>
+  </div>
+
+  <!-- Phaser 4 з CDN (працює у браузері користувача) -->
+  <script src="https://cdn.jsdelivr.net/npm/phaser@4/dist/phaser.min.js"></script>
+
+  <!-- Код гри -->
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/fighter.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/scenes/boot.js"></script>
+  <script src="js/scenes/menu.js"></script>
+  <script src="js/scenes/fight.js"></script>
+  <script src="js/scenes/rescue.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    // Запуск після завантаження сторінки
+    window.addEventListener('load', function () {
+      if (typeof Phaser === 'undefined') {
+        document.getElementById('game-container').innerHTML =
+          '<p style="color:#fff;padding:20px;text-align:center">' +
+          'Не вдалося завантажити рушій гри (Phaser). Перевір зʼєднання з інтернетом.</p>';
+        return;
+      }
+      window.NOSYK.initTouchControls();
+      window.NOSYK.startGame();
+    });
+  </script>
+</body>
+</html>
