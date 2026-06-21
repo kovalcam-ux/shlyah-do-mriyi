@@ -1,5 +1,10 @@
 /* ============================================================
    Керування: клавіатура (ПК) + сенсор (телефон).
+
+   ВАЖЛИВО: клавіші зчитуються за ФІЗИЧНИМ розташуванням (event.code:
+   KeyA, KeyD, KeyJ...), тому працюють на будь-якій розкладці —
+   українській, російській чи англійській.
+
    touchState заповнюється DOM-джойстиком і кнопками (initTouchControls).
    PlayerInput.get() обʼєднує клавіатуру і сенсор в один обʼєкт.
    ============================================================ */
@@ -18,6 +23,27 @@ window.NOSYK.touchState = {
       (navigator.maxTouchPoints > 0) ||
       window.matchMedia('(pointer: coarse)').matches;
   };
+
+  /** Глобальний трекер фізичних клавіш за event.code (незалежно від мови). */
+  window.NOSYK.keys = window.NOSYK.keys || (function () {
+    const pressed = Object.create(null);
+    const GAME = new Set([
+      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+      'KeyA', 'KeyD', 'KeyW', 'KeyS', 'KeyJ', 'KeyK', 'KeyL',
+    ]);
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('keydown', (e) => {
+        if (GAME.has(e.code)) { pressed[e.code] = true; e.preventDefault(); }
+      });
+      window.addEventListener('keyup', (e) => {
+        if (GAME.has(e.code)) { pressed[e.code] = false; }
+      });
+      window.addEventListener('blur', () => {
+        for (const k in pressed) pressed[k] = false;
+      });
+    }
+    return { down: (code) => !!pressed[code] };
+  })();
 
   /** Підключення DOM-джойстика і кнопок. Викликати після завантаження сторінки. */
   window.NOSYK.initTouchControls = function () {
@@ -91,28 +117,21 @@ window.NOSYK.touchState = {
     bind('btn-block', 'block');
   };
 
-  /** Клавіатура гравця через Phaser. */
+  /** Клавіатура гравця за фізичним розташуванням клавіш (event.code). */
   class PlayerInput {
-    constructor(scene) {
-      const KC = Phaser.Input.Keyboard.KeyCodes;
-      this.keys = scene.input.keyboard.addKeys({
-        left: KC.LEFT, right: KC.RIGHT, up: KC.UP, down: KC.DOWN,
-        a: KC.A, d: KC.D, w: KC.W, s: KC.S,
-        j: KC.J, k: KC.K, l: KC.L,
-      });
-    }
+    constructor(scene) { this.scene = scene; }
 
     get() {
-      const k = this.keys;
+      const K = window.NOSYK.keys;
       const t = window.NOSYK.touchState;
       return {
-        left: k.left.isDown || k.a.isDown || t.left,
-        right: k.right.isDown || k.d.isDown || t.right,
-        up: k.up.isDown || k.w.isDown || t.up,
-        down: k.down.isDown || k.s.isDown || t.down,
-        punch: k.j.isDown || t.punch,
-        kick: k.k.isDown || t.kick,
-        block: k.l.isDown || t.block,
+        left: K.down('ArrowLeft') || K.down('KeyA') || t.left,
+        right: K.down('ArrowRight') || K.down('KeyD') || t.right,
+        up: K.down('ArrowUp') || K.down('KeyW') || t.up,
+        down: K.down('ArrowDown') || K.down('KeyS') || t.down,
+        punch: K.down('KeyJ') || t.punch,
+        kick: K.down('KeyK') || t.kick,
+        block: K.down('KeyL') || t.block,
       };
     }
   }
