@@ -70,6 +70,7 @@ window.NOSYK = window.NOSYK || {};
       this.add.rectangle(m, top, barW, barH, 0x000000, 0.55).setOrigin(0, 0).setStrokeStyle(2, COLORS.CREAM);
       this.add.rectangle(WIDTH - m, top, barW, barH, 0x000000, 0.55).setOrigin(1, 0).setStrokeStyle(2, COLORS.CREAM);
 
+      // заповнення на повну ширину; зменшуємо через scaleX (не чіпаємо геометрію)
       this.pHpFill = this.add.rectangle(m + 2, top + 2, barW - 4, barH - 4, 0x5fa46f).setOrigin(0, 0);
       this.bHpFill = this.add.rectangle(WIDTH - m - 2, top + 2, barW - 4, barH - 4, 0x5fa46f).setOrigin(1, 0);
       this._barW = barW - 4;
@@ -104,8 +105,8 @@ window.NOSYK = window.NOSYK || {};
       const max = CFG().FIGHT.MAX_HP;
       const pr = Phaser.Math.Clamp(this.player.hp / max, 0, 1);
       const br = Phaser.Math.Clamp(this.bot.hp / max, 0, 1);
-      this.pHpFill.width = this._barW * pr;
-      this.bHpFill.width = this._barW * br;
+      this.pHpFill.scaleX = pr;
+      this.bHpFill.scaleX = br;
       this.pHpFill.setFillStyle(this._hpColor(pr));
       this.bHpFill.setFillStyle(this._hpColor(br));
       this.timerText.setText(String(Math.max(0, Math.ceil(this.timeLeft))));
