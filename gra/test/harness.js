@@ -62,9 +62,11 @@ global.Phaser = {
 
 // --- Завантаження бойового коду ---
 require('../js/config.js');
+require('../js/main.js');   // визначає window.NOSYK.addText (не запускає гру)
 require('../js/effects.js');
 require('../js/fighter.js');
 require('../js/ai.js');
+window.NOSYK.SS = 2;        // коеф. суперсемплінгу для тесту
 
 const N = window.NOSYK;
 let pass = 0, fail = 0;

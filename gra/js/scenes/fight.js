@@ -13,6 +13,9 @@ window.NOSYK = window.NOSYK || {};
 
     create() {
       const { WIDTH, HEIGHT, GROUND_Y, COLORS } = CFG();
+      window.NOSYK.fitCamera(this);
+      // межі світу — у дизайн-координатах (не у високій роздільності канвасу)
+      this.physics.world.setBounds(0, 0, WIDTH, HEIGHT);
 
       // ---- Стан матчу ----
       this.phase = 'intro';            // intro | fight | roundover | matchover
@@ -47,7 +50,7 @@ window.NOSYK = window.NOSYK || {};
       this._buildHud();
 
       // ---- Банер у центрі ----
-      this.banner = this.add.text(WIDTH / 2, HEIGHT / 2 - 30, '', {
+      this.banner = window.NOSYK.addText(this, WIDTH / 2, HEIGHT / 2 - 30, '', {
         fontFamily: 'Arial Black, Arial, sans-serif', fontSize: '72px',
         color: '#ffffff', fontStyle: 'bold', stroke: '#0b1322', strokeThickness: 8,
       }).setOrigin(0.5).setDepth(200).setAlpha(0);
@@ -71,15 +74,15 @@ window.NOSYK = window.NOSYK || {};
       this.bHpFill = this.add.rectangle(WIDTH - m - 2, top + 2, barW - 4, barH - 4, 0x5fa46f).setOrigin(1, 0);
       this._barW = barW - 4;
 
-      this.add.text(m, top + barH + 4, CFG().FIGHTERS.player.name, {
+      window.NOSYK.addText(this, m, top + barH + 4, CFG().FIGHTERS.player.name, {
         fontFamily: 'Arial, sans-serif', fontSize: '18px', color: '#ffffff', fontStyle: 'bold',
       }).setOrigin(0, 0);
-      this.add.text(WIDTH - m, top + barH + 4, CFG().FIGHTERS.dilok.name, {
+      window.NOSYK.addText(this, WIDTH - m, top + barH + 4, CFG().FIGHTERS.dilok.name, {
         fontFamily: 'Arial, sans-serif', fontSize: '18px', color: '#ffffff', fontStyle: 'bold',
       }).setOrigin(1, 0);
 
       // таймер
-      this.timerText = this.add.text(WIDTH / 2, top + 2, String(this.timeLeft), {
+      this.timerText = window.NOSYK.addText(this, WIDTH / 2, top + 2, String(this.timeLeft), {
         fontFamily: 'Arial Black, Arial, sans-serif', fontSize: '40px', color: '#ffffff', fontStyle: 'bold',
       }).setOrigin(0.5, 0);
 

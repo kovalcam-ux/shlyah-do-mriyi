@@ -108,7 +108,7 @@ window.NOSYK = window.NOSYK || {};
           .setAngle(18);
         // торба з грошима
         this.pBag = scene.add.circle(-w * 0.46, hipY + legLen * 0.25, w * 0.22, 0x9c7b34).setStrokeStyle(3, 0x5c4718);
-        this.pBagS = scene.add.text(-w * 0.46, hipY + legLen * 0.25, '$', {
+        this.pBagS = window.NOSYK.addText(scene, -w * 0.46, hipY + legLen * 0.25, '$', {
           fontFamily: 'Arial Black, Arial, sans-serif', fontSize: Math.round(w * 0.3) + 'px',
           color: '#f0c453', fontStyle: 'bold',
         }).setOrigin(0.5);

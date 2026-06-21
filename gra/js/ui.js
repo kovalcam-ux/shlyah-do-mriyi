@@ -15,7 +15,7 @@ window.NOSYK.UI = {
 
     const bg = scene.add.rectangle(0, 0, w, h, fill, 1)
       .setStrokeStyle(3, COL.CREAM, 0.9);
-    const txt = scene.add.text(0, 0, label, {
+    const txt = window.NOSYK.addText(scene, 0, 0, label, {
       fontFamily: 'Arial, sans-serif',
       fontSize: fontSize + 'px',
       color: '#ffffff',
