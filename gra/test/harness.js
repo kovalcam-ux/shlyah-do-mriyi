@@ -36,6 +36,7 @@ function makeScene() {
     add: {
       rectangle() { return makeGO(); },
       circle() { return makeGO(); },
+      arc() { return makeGO(); },
       text() { return makeGO(); },
       container() { return makeGO(); },
       graphics() { return makeGO(); },
@@ -50,6 +51,12 @@ global.Phaser = {
     Between: (a, b) => Math.floor((a + b) / 2),
     FloatBetween: (a, b) => (a + b) / 2,
     Clamp: (v, a, b) => Math.max(a, Math.min(b, v)),
+  },
+  Display: {
+    Color: {
+      IntegerToColor: (c) => ({ red: (c >> 16) & 255, green: (c >> 8) & 255, blue: c & 255 }),
+      GetColor: (r, g, b) => (r << 16) | (g << 8) | b,
+    },
   },
 };
 
