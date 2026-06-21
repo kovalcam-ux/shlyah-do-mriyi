@@ -13,17 +13,19 @@ window.NOSYK = window.NOSYK || {};
 
     create() {
       const { WIDTH, HEIGHT, COLORS } = CFG();
+      const T = window.NOSYK.addText;
+      window.NOSYK.fitCamera(this);
 
       // фон
       this.add.rectangle(0, 0, WIDTH, HEIGHT, COLORS.NAVY).setOrigin(0);
       this.add.rectangle(0, HEIGHT, WIDTH, 160, COLORS.DARK).setOrigin(0, 1);
 
       // заголовок
-      this.add.text(WIDTH / 2, 90, 'ЗАГІН НОСИК', {
+      T(this, WIDTH / 2, 90, 'ЗАГІН НОСИК', {
         fontFamily: 'Arial Black, Arial, sans-serif', fontSize: '64px',
         color: '#ffffff', fontStyle: 'bold',
       }).setOrigin(0.5);
-      this.add.text(WIDTH / 2, 138, 'Бій за тварин • прототип', {
+      T(this, WIDTH / 2, 138, 'Бій за тварин • прототип', {
         fontFamily: 'Arial, sans-serif', fontSize: '22px', color: '#f0c453',
       }).setOrigin(0.5);
 
@@ -31,7 +33,7 @@ window.NOSYK = window.NOSYK || {};
       const help = window.NOSYK.isTouchDevice()
         ? 'Телефон: джойстик ліворуч — рух/стрибок/присід.\nКнопки праворуч — удар, нога, блок.'
         : 'Рух: ← → або A D    Стрибок: ↑    Присід: ↓\nУдар рукою: J    Удар ногою: K    Блок: L';
-      this.add.text(WIDTH / 2, 240, help, {
+      T(this, WIDTH / 2, 240, help, {
         fontFamily: 'Arial, sans-serif', fontSize: '20px', color: '#cdd9ee',
         align: 'center', lineSpacing: 8,
       }).setOrigin(0.5);
@@ -46,11 +48,11 @@ window.NOSYK = window.NOSYK || {};
         this._bloodLabel(), () => this._toggleBlood(),
         { fill: 0x223a66, fontSize: 22 });
 
-      this.add.text(WIDTH / 2, 482, 'За замовчуванням кров вимкнено (безпечний режим).', {
+      T(this, WIDTH / 2, 482, 'За замовчуванням кров вимкнено (безпечний режим).', {
         fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#8aa0c2',
       }).setOrigin(0.5);
 
-      this.add.text(WIDTH / 2, HEIGHT - 22,
+      T(this, WIDTH / 2, HEIGHT - 22,
         'Притулок «Шлях до мрії» — рятуємо тварин по-справжньому 🐾', {
         fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#7f93b5',
       }).setOrigin(0.5);

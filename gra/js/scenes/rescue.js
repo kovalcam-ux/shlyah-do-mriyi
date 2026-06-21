@@ -17,11 +17,13 @@ window.NOSYK = window.NOSYK || {};
     create() {
       const { WIDTH, HEIGHT, COLORS } = CFG();
       const groundY = 360;
+      const T = window.NOSYK.addText;
+      window.NOSYK.fitCamera(this);
 
       this.add.rectangle(0, 0, WIDTH, HEIGHT, COLORS.NAVY).setOrigin(0);
       this.add.rectangle(WIDTH / 2, groundY + 90, WIDTH, 180, 0x10203c).setOrigin(0.5);
 
-      this.add.text(WIDTH / 2, 56, 'ПЕРЕМОГА!', {
+      T(this, WIDTH / 2, 56, 'ПЕРЕМОГА!', {
         fontFamily: 'Arial Black, Arial, sans-serif', fontSize: '60px',
         color: '#f0c453', fontStyle: 'bold', stroke: '#0b1322', strokeThickness: 6,
       }).setOrigin(0.5);
@@ -37,7 +39,7 @@ window.NOSYK = window.NOSYK || {};
       const police = this.add.container(1080, groundY - 65);
       police.add(this.add.rectangle(0, 0, 60, 130, 0x2e5cb8).setStrokeStyle(4, 0xbcd2ff));
       police.add(this.add.rectangle(0, -78, 56, 22, 0x14306e)); // кашкет
-      police.add(this.add.text(0, 0, 'ПОЛІЦІЯ', {
+      police.add(T(this, 0, 0, 'ПОЛІЦІЯ', {
         fontFamily: 'Arial, sans-serif', fontSize: '13px', color: '#ffffff', fontStyle: 'bold',
       }).setOrigin(0.5).setAngle(-90));
 
@@ -57,7 +59,7 @@ window.NOSYK = window.NOSYK || {};
       this.animal = animal;
 
       // --- Заклик ---
-      this.cta = this.add.text(WIDTH / 2, 430,
+      this.cta = T(this, WIDTH / 2, 430,
         'Хочеш рятувати тварин по-справжньому?\n' +
         'Роби репости наших публікацій, розповідай друзям про стерилізацію, ділися інформацією.',
         {
@@ -123,7 +125,7 @@ window.NOSYK = window.NOSYK || {};
 
     _hearts(x, y) {
       for (let i = 0; i < 6; i++) {
-        const h = this.add.text(x + Phaser.Math.Between(-40, 40), y, '❤', {
+        const h = window.NOSYK.addText(this, x + Phaser.Math.Between(-40, 40), y, '❤', {
           fontSize: Phaser.Math.Between(16, 26) + 'px', color: '#ff6b6b',
         }).setOrigin(0.5).setDepth(60);
         this.tweens.add({
